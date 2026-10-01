@@ -10,10 +10,20 @@ import { CATALOG } from "./catalog.ts";
 import { CATEGORY_MAP, typesFor } from "./category-map.ts";
 import { findCandidates, matchesType } from "./match.ts";
 import { loadLatestSnapshots } from "./snapshots.ts";
+import type { SnapshotFile } from "./types.ts";
 
-const { date, snapshots } = await loadLatestSnapshots();
-snapshots.sort((a, b) => a.chain.localeCompare(b.chain, "mk"));
-console.log(`Ценовници од ${date}: ${snapshots.map((s) => s.label).join(", ")}\n`);
+const latest = await loadLatestSnapshots();
+console.log(`Ценовници од ${latest.date}: ${latest.snapshots.length} продавници\n`);
+
+// Мапата е по синџир, па продавниците од ист синџир се спојуваат: секој производ
+// (по име) еднаш, од која било продавница каде го има.
+const snapshots: SnapshotFile[] = [...Map.groupBy(latest.snapshots, (s) => s.chain)]
+  .sort(([a], [b]) => a.localeCompare(b, "mk"))
+  .map(([chain, stores]) => ({
+    ...stores[0],
+    label: chain,
+    offers: [...new Map(stores.flatMap((s) => s.offers).map((o) => [o.name, o] as const)).values()],
+  }));
 
 // 1. Нови категории
 let newCount = 0;
