@@ -1,0 +1,19 @@
+{
+  "name": "poevtino",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Каде поевтино? — споредба на цела кошничка низ маркетите во Македонија",
+  "type": "module",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "fetch": "node src/fetch.ts",
+    "basket": "node src/cli.ts",
+    "test": "node --test \"src/**/*.test.ts\"",
+    "categories": "node src/categories.ts"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0"
+  }
+}
