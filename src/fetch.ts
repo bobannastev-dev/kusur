@@ -24,7 +24,7 @@ const results = await runByHost(
   async (store) => {
     const t = Date.now();
     try {
-      const { updatedAt, offers } = await store.fetchOffers();
+      const { updatedAt, offers, completeness } = await store.fetchOffers();
       // Празен ценовник не смее да ги замени вчерашните цени со „ништо".
       if (offers.length === 0) throw new Error("празен ценовник");
       await saveSnapshot(date, {
@@ -36,7 +36,10 @@ const results = await runByHost(
         updatedAt,
         offers,
       });
-      console.log(`✓ ${store.label}: ${offers.length} производи (ажурирано: ${updatedAt ?? "непознато"}) — ${secondsSince(t)} сек`);
+      const passes = completeness
+        ? `, ${completeness.passes} поминув.${offers.length < completeness.expected ? `, НЕДОСТИГААТ ${completeness.expected - offers.length} од ${completeness.expected}` : ""}`
+        : "";
+      console.log(`✓ ${store.label}: ${offers.length} производи (ажурирано: ${updatedAt ?? "непознато"}${passes}) — ${secondsSince(t)} сек`);
     } catch (err) {
       console.error(`✗ ${store.label}: ${err instanceof Error ? err.message : err} — ${secondsSince(t)} сек`);
       throw err;

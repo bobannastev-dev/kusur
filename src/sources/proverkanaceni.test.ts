@@ -12,6 +12,8 @@ test("Жито: редови, датум на ажурирање, ред без 
   assert.equal(updatedAt, "01/10/2026 21:05");
   assert.equal(rowCount, 15);
   assert.equal(offers.length, 15);
+  // Колку производи објавува изворот за целото пребарување (фикстурата е скратена).
+  assert.equal(parseProverkaPage(fixture("zito-veles.html")).total, 63);
   assert.deepEqual(offers[0], {
     name: "МЛЕКО АЛПСКО 3.5% 1л СЛОВЕНСКО",
     price: 82,
@@ -32,8 +34,9 @@ test("Жито: ред со акција", () => {
 });
 
 test("Стокомак: иста платформа, друг синџир", () => {
-  const { updatedAt, offers } = parseProverkaPage(fixture("stokomak-veles.html"));
+  const { updatedAt, offers, total } = parseProverkaPage(fixture("stokomak-veles.html"));
   assert.equal(updatedAt, "01/10/2026 21:05");
+  assert.equal(total, 2610);
   assert.equal(offers.length, 15);
   const limon = offers.find((o) => o.name === "ЛИМОН СВЕЖ КГР")!;
   assert.deepEqual(

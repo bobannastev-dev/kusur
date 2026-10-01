@@ -51,5 +51,5 @@ test("споредба со регистарот: нови, исчезнати, 
 
 test("вистинскиот регистар: секоја продавница има sourceId", () => {
   for (const s of STORES) assert.ok(s.sourceId, s.id);
-  assert.equal(IGNORED_STORES.length, 4);
+  assert.equal(IGNORED_STORES.length, 12);
 });

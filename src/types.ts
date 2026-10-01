@@ -33,6 +33,8 @@ export interface StoreSnapshot {
   /** Датум и време на последно ажурирање според маркетот, ако е објавено. */
   updatedAt: string | null;
   offers: Offer[];
+  /** Кај извори со повеќе поминувања: колку производи објавува изворот и колку поминувања требале. */
+  completeness?: { expected: number; passes: number };
 }
 
 export interface SnapshotFile extends StoreSnapshot {

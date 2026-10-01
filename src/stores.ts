@@ -24,18 +24,11 @@ function kam(shopId: number, label: string): Store {
 
 export const STORES: Store[] = [
   // Жито: org од <select> на zito.proverkanaceni.mk. Цените се исти во сите
-  // продавници во Велес (проверено 2026-10-01), се разликува асортиманот.
-  zito("zito-veles-trgovski", 2, "Жито Трговски"),
-  zito("zito-veles-internat", 7, "Жито Интернат"),
-  zito("zito-veles-vane", 9, "Жито Ване"),
-  zito("zito-veles-sokolana", 15, "Жито Соколана"),
+  // продавници во Велес (проверено 2026-10-01), па се преземаат само трите со
+  // најголем асортиман; секоја во повеќе поминувања (види sources/passes.ts).
   zito("zito-veles-centar", 16, "Жито Центар"),
-  zito("zito-veles-fontana", 19, "Жито Фонтана"),
-  zito("zito-veles-bagremche", 20, "Жито Багремче"),
+  zito("zito-veles-vane", 9, "Жито Ване"),
   zito("zito-veles-opshtina", 29, "Жито Општина"),
-  zito("zito-veles-gradski-saat", 37, "Жито Градски Саат"),
-  zito("zito-veles-kim", 51, "Жито КиМ"),
-  zito("zito-veles-gradinka", 53, "Жито Градинка"),
 
   stokomak("stokomak-veles", 41, "Стокомак Велес"),
   stokomak("stokomak-veles-2", 65, "Стокомак Велес 2"),
@@ -55,10 +48,20 @@ export const STORES: Store[] = [
   kam(94, "КАМ Бауман"), // ул. Алексо Демниевски Бауман бр. 53
 ];
 
+const SAME_PRICES = "исти цени во Велес; се преземаат само 3-те најголеми продавници на Жито (одлука, 2026-10-01)";
+
 /** Продавници во Велес што постојат во изворите, но свесно не се преземаат. */
 export const IGNORED_STORES = [
   { chain: "Жито", sourceId: 10, label: "Жито Ване Кат", reason: "само непрехрана (облека, галантерија), ~4.200 производи" },
   { chain: "Жито", sourceId: 55, label: "Жито Којник", reason: "празен ценовник (0 производи на 2026-10-01)" },
   { chain: "Жито", sourceId: 78, label: "Ла Фамилиа Велес", reason: "главно непрехрана; изоставена со одлука (Checkpoint 2, 2026-10-01)" },
   { chain: "Жито", sourceId: 83, label: "Жито Дос Велес", reason: "изоставена со одлука (Checkpoint 2, 2026-10-01), иако има храна" },
+  { chain: "Жито", sourceId: 2, label: "Жито Трговски", reason: SAME_PRICES },
+  { chain: "Жито", sourceId: 7, label: "Жито Интернат", reason: SAME_PRICES },
+  { chain: "Жито", sourceId: 15, label: "Жито Соколана", reason: SAME_PRICES },
+  { chain: "Жито", sourceId: 19, label: "Жито Фонтана", reason: SAME_PRICES },
+  { chain: "Жито", sourceId: 20, label: "Жито Багремче", reason: SAME_PRICES },
+  { chain: "Жито", sourceId: 37, label: "Жито Градски Саат", reason: SAME_PRICES },
+  { chain: "Жито", sourceId: 51, label: "Жито КиМ", reason: SAME_PRICES },
+  { chain: "Жито", sourceId: 53, label: "Жито Градинка", reason: SAME_PRICES },
 ];
