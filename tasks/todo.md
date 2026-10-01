@@ -30,7 +30,7 @@
   - Фајлови: `src/sources/kam.ts`, `src/sources/kam.test.ts`, `src/sources/fixtures/kam-*.pdf`, `package.json`
   - Обем: M
 
-- [ ] **Задача 3: КАМ извор и продавници**
+- [x] **Задача 3: КАМ извор и продавници**
   - Опис: `POST ShopsWeb/LoadShopList` → `ShopFiles[0].RelativePath` → PDF → парсер. Трите КАМ продавници во Велес (40, 61, 94) во регистарот.
   - Прифаќање:
     - `npm run fetch -- kam` снима 3 продавници, секоја > 1.500 производи, со датум од маркетот.

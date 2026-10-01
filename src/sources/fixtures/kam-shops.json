@@ -1,0 +1,78 @@
+[
+ {
+  "Id": 40,
+  "Name": "Велес",
+  "Address": "ул. 8ми Септември бр. 148 (ул. Маршал Тито бб згр.2вл.1-сутерен)",
+  "City": "Велес",
+  "Municipality": "Велес",
+  "ShopFiles": [
+   {
+    "RelativePath": "2026/10/01/40.pdf",
+    "Title": "40.pdf",
+    "Description": null,
+    "Author": "nsadmin",
+    "DateUploaded": "/Date(1790805600000)/",
+    "ResourceFileId": "afd8f938-ecb2-47ce-bb81-cfe466459135",
+    "Type": 1,
+    "Id": 204
+   }
+  ]
+ },
+ {
+  "Id": 94,
+  "Name": "Велес",
+  "Address": "ул. Алексо Демниевски Бауман бр. 53",
+  "City": "Велес",
+  "Municipality": "Велес",
+  "ShopFiles": [
+   {
+    "RelativePath": "2026/10/01/94.pdf",
+    "Title": "94.pdf",
+    "Description": null,
+    "Author": "nsadmin",
+    "DateUploaded": "/Date(1790805600000)/",
+    "ResourceFileId": "f0986fa9-76cb-4280-a432-cf0aef355549",
+    "Type": 1,
+    "Id": 257
+   }
+  ]
+ },
+ {
+  "Id": 61,
+  "Name": "Велес",
+  "Address": "ул. 11-ти Октомври бб",
+  "City": "Велес",
+  "Municipality": "Велес",
+  "ShopFiles": [
+   {
+    "RelativePath": "2026/10/01/61.pdf",
+    "Title": "61.pdf",
+    "Description": null,
+    "Author": "nsadmin",
+    "DateUploaded": "/Date(1790805600000)/",
+    "ResourceFileId": "d5d0d992-bac7-4542-9f67-90488ea79c77",
+    "Type": 1,
+    "Id": 206
+   }
+  ]
+ },
+ {
+  "Id": 73,
+  "Name": "Радовиш",
+  "Address": "бул. Александар Македонски бр.34 А",
+  "City": "Радовиш",
+  "Municipality": "Радовиш",
+  "ShopFiles": [
+   {
+    "RelativePath": "2026/10/01/73.pdf",
+    "Title": "73.pdf",
+    "Description": null,
+    "Author": "nsadmin",
+    "DateUploaded": "/Date(1790805600000)/",
+    "ResourceFileId": "d30c107c-3fa2-4cd0-b379-a9fb3987ed10",
+    "Type": 1,
+    "Id": 272
+   }
+  ]
+ }
+]

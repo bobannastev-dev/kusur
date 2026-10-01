@@ -3,7 +3,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
-import { parseKamPdf } from "./kam.ts";
+import { kamPricelistUrl, parseKamPdf } from "./kam.ts";
 
 const pdf = () => new Uint8Array(readFileSync(new URL("./fixtures/kam-veles-40-p1-3.pdf", import.meta.url)));
 
@@ -45,4 +45,18 @@ test("КАМ: ред без единечна цена", async () => {
   assert.equal(first.name, "БОНБОНИ ЕВРОПА НОИР 100ГР");
   assert.equal(first.price, 24);
   assert.equal(first.unitPriceText, "");
+});
+
+// Фикстура: продавниците во Велес и една друга од ShopsWeb/LoadShopList (2026-10-01).
+const shops = JSON.parse(readFileSync(new URL("./fixtures/kam-shops.json", import.meta.url), "utf8"));
+
+test("КАМ: адреса на ценовникот на продавница", () => {
+  assert.equal(kamPricelistUrl(shops, 40), "https://kam.com.mk/2026/10/01/40.pdf");
+  assert.equal(kamPricelistUrl(shops, 94), "https://kam.com.mk/2026/10/01/94.pdf");
+});
+
+test("КАМ: непозната продавница или продавница без ценовник е грешка", () => {
+  assert.throws(() => kamPricelistUrl(shops, 12345), /нема продавница 12345/);
+  assert.throws(() => kamPricelistUrl([{ Id: 7, Name: "Тест", ShopFiles: [] }], 7), /нема ценовник/);
+  assert.throws(() => kamPricelistUrl({ error: "x" }, 40), /неочекуван одговор/);
 });

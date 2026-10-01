@@ -7,6 +7,7 @@
 
 import { getDocument } from "pdfjs-dist/legacy/build/pdf.mjs";
 import type { TextItem } from "pdfjs-dist/types/src/display/api.js";
+import { fetchBytes, postJson } from "../net.ts";
 import { parsePrice } from "../parse.ts";
 import type { Offer, StoreSnapshot } from "../types.ts";
 
@@ -144,4 +145,27 @@ export async function parseKamPdf(data: Uint8Array): Promise<KamPage> {
   } finally {
     await task.destroy();
   }
+}
+
+const KAM_BASE = "https://kam.com.mk/";
+
+/**
+ * Адресата на денешниот PDF ценовник на продавница, од одговорот на
+ * `ShopsWeb/LoadShopList` (листа продавници, секоја со `ShopFiles[0].RelativePath`).
+ * Одговорот доаѓа однадвор, па се проверува.
+ */
+export function kamPricelistUrl(shops: unknown, shopId: number): string {
+  if (!Array.isArray(shops)) throw new Error("КАМ: неочекуван одговор од листата продавници");
+  const shop = shops.find((s) => s && typeof s === "object" && (s as { Id?: unknown }).Id === shopId);
+  if (!shop) throw new Error(`КАМ: нема продавница ${shopId} во листата`);
+  const path = (shop as { ShopFiles?: { RelativePath?: unknown }[] }).ShopFiles?.[0]?.RelativePath;
+  if (typeof path !== "string" || !path.endsWith(".pdf")) throw new Error(`КАМ: продавницата ${shopId} нема ценовник`);
+  return new URL(path, KAM_BASE).href;
+}
+
+/** Цел ценовник на една продавница на КАМ: листа продавници → PDF → редови. */
+export async function fetchKam(shopId: number): Promise<StoreSnapshot> {
+  const url = kamPricelistUrl(await postJson(new URL("ShopsWeb/LoadShopList", KAM_BASE).href, null), shopId);
+  const { updatedAt, offers } = await parseKamPdf(await fetchBytes(url));
+  return { updatedAt, offers };
 }
