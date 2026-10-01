@@ -46,6 +46,7 @@
 ```
 npm install                     # зависности
 npm test                        # сите тестови (node:test)
+npm run typecheck               # проверка на типови (tsc, без компајлирање)
 npm run fetch                   # презема ценовници (npm run fetch -- zito за еден синџир)
 npm run categories              # преглед на мапата категорија → тип
 npm run basket -- "млеко, 10 јајца, кило сирење"     # споредба од командна линија
@@ -88,6 +89,7 @@ export function cheapestPurchase(store: SnapshotFile, type: ProductType, need: n
 - Типови од TypeScript без `any`; податоците од надвор (HTML, PDF, база) се проверуваат на границата.
 - Регекси за кирилица со `u` и `(?!\p{L})` наместо `\b`.
 - Без форматер засега; 2 празни места, двојни наводници, `;` на крај.
+- Само синтакса што Node може да ја избрише (`erasableSyntaxOnly`): без `enum`, `namespace`, параметри-својства; `import type` за типови.
 
 ## Тестирање
 
@@ -101,7 +103,7 @@ export function cheapestPurchase(store: SnapshotFile, type: ProductType, need: n
 ## Граници
 
 **Секогаш:**
-- `npm test` да поминува пред секој commit.
+- `npm test` и `npm run typecheck` да поминуваат пред секој commit.
 - Искрен User-Agent со контакт и пауза меѓу барањата кон ист сервер.
 - Секоја прикажана цена со датумот на ажурирање од маркетот.
 - Spec-от се ажурира пред да се смени однесување што го опишува.

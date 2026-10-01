@@ -1,0 +1,19 @@
+{
+  // Само проверка на типови (npm run typecheck). Кодот го извршува Node директно,
+  // со бришење на типовите, затоа: без emit, увоз со .ts наставка и само синтакса
+  // што може да се избрише (без enum, namespace и параметри-својства).
+  "compilerOptions": {
+    "target": "es2024",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "lib": ["es2024"],
+    "types": ["node"],
+    "strict": true,
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "erasableSyntaxOnly": true,
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*.ts"]
+}
