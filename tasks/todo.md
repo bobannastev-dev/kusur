@@ -112,47 +112,15 @@
   - Фајлови: `src/price-store.ts`, `src/price-store-file.ts`, `src/price-store.contract.ts`, `src/price-store-file.test.ts`, `src/fetch.ts`
   - Обем: M
 
-### Checkpoint 3
+### Checkpoint 3 (модулот готов, локално)
 - [ ] Две последователни преземања создаваат промени; повторено во ист ден не
 - [ ] Застарените продавници се печатат
-- [ ] `npm test` зелен; преглед со човек
+- [ ] Критериумите од `SPEC-price-ingest.md` исполнети (без Postgres)
+- [ ] `/review` на модулот; spec ажуриран ако нешто се сменило
+- [ ] Белешката во Second Brain ажурирана
 
 ---
 
-## Фаза 4: Postgres
+## Подоцна: Postgres (не е дел од ова градење)
 
-- [ ] **Задача 9: Neon база и миграции**
-  - Опис: Neon преку Vercel Marketplace (вие го поврзувате; јас ги давам чекорите). `DATABASE_URL` само во `.env` (во `.gitignore`). Миграции како `.sql` во `db/migrations/`, мал извршувач `npm run db:migrate`. Табели `stores`, `offers_current`, `price_changes`. Зависност `@neondatabase/serverless` — потврда пред инсталација.
-  - Прифаќање:
-    - `npm run db:migrate` на празна база ги создава табелите; второ извршување не прави ништо.
-    - Нема тајна во git (`git grep` за connection string е празен).
-  - Проверка: рачно на Neon база; `npm test` зелен
-  - Зависи од: 8
-  - Фајлови: `db/migrations/001_init.sql`, `src/db.ts`, `src/migrate.ts`, `package.json`, `.env.example`
-  - Обем: M
-
-- [ ] **Задача 10: Postgres `PriceStore`**
-  - Опис: имплементација врз табелите; `offers_current` се ажурира, `price_changes` се додава. Бришење промени постари од 1 година.
-  - Прифаќање:
-    - Заедничкиот тест-пакет поминува врз тест-база (`TEST_DATABASE_URL`, посебна Neon гранка); без таа променлива тестот се прескокнува со порака.
-    - Повторно зачувување во ист ден → без дупли промени.
-  - Проверка: `TEST_DATABASE_URL=… npm test`
-  - Зависи од: 9
-  - Фајлови: `src/price-store-pg.ts`, `src/price-store-pg.test.ts`
-  - Обем: M
-
-- [ ] **Задача 11: `fetch` пишува во Postgres**
-  - Опис: со `DATABASE_URL` → Postgres, инаку датотеки. Печати каде се пишува.
-  - Прифаќање:
-    - `npm run fetch` со `DATABASE_URL` ги полни табелите за сите 19 продавници.
-    - Без `DATABASE_URL` однесувањето е исто како пред задачата.
-  - Проверка: рачно, број редови во `offers_current` по продавница
-  - Зависи од: 10
-  - Фајлови: `src/fetch.ts`, `src/price-store.ts`
-  - Обем: S
-
-### Checkpoint 4 (модулот готов)
-- [ ] Сите 8 критериуми од `SPEC-price-ingest.md`
-- [ ] `/review` на модулот
-- [ ] Spec ажуриран ако нешто се сменило
-- [ ] Белешката во Second Brain ажурирана
+Се планира кога ќе се одбере давател (Neon, Supabase или друг). Види `tasks/plan.md`.
