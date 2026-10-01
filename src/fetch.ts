@@ -2,6 +2,8 @@
 // Употреба: npm run fetch            (сите продавници)
 //           npm run fetch -- zito    (само продавници чиј id почнува со „zito")
 
+import { runByHost } from "./fetch-plan.ts";
+import { REQUEST_DELAY_MS } from "./net.ts";
 import { saveSnapshot } from "./snapshots.ts";
 import { STORES } from "./stores.ts";
 
@@ -13,15 +15,18 @@ if (stores.length === 0) {
 }
 
 const date = new Date().toLocaleDateString("sv-SE"); // локален датум како YYYY-MM-DD
-let failed = 0;
+const started = Date.now();
+const secondsSince = (t: number) => ((Date.now() - t) / 1000).toFixed(0);
 
-// Продавниците се на различни сервери, па ги преземаме паралелно;
-// барањата кон ист сервер остануваат последователни со пауза.
-await Promise.all(
-  stores.map(async (store) => {
-    const started = Date.now();
+// Различни сервери паралелно; продавниците на ист сервер една по една, со пауза.
+const results = await runByHost(
+  stores,
+  async (store) => {
+    const t = Date.now();
     try {
       const { updatedAt, offers } = await store.fetchOffers();
+      // Празен ценовник не смее да ги замени вчерашните цени со „ништо".
+      if (offers.length === 0) throw new Error("празен ценовник");
       await saveSnapshot(date, {
         storeId: store.id,
         chain: store.chain,
@@ -31,13 +36,15 @@ await Promise.all(
         updatedAt,
         offers,
       });
-      const secs = ((Date.now() - started) / 1000).toFixed(0);
-      console.log(`✓ ${store.label}: ${offers.length} производи (ажурирано: ${updatedAt ?? "непознато"}) — ${secs} сек`);
+      console.log(`✓ ${store.label}: ${offers.length} производи (ажурирано: ${updatedAt ?? "непознато"}) — ${secondsSince(t)} сек`);
     } catch (err) {
-      failed++;
-      console.error(`✗ ${store.label}: ${err instanceof Error ? err.message : err}`);
+      console.error(`✗ ${store.label}: ${err instanceof Error ? err.message : err} — ${secondsSince(t)} сек`);
+      throw err;
     }
-  }),
+  },
+  REQUEST_DELAY_MS,
 );
 
+const failed = results.filter((r) => r.error).length;
+console.log(`\n${results.length - failed}/${results.length} продавници за ${secondsSince(started)} сек`);
 if (failed > 0) process.exit(1);

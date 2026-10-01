@@ -22,6 +22,8 @@ export interface Store {
   chain: string;
   label: string;
   city: string;
+  /** Серверот од кој се презема; продавниците на ист сервер се преземаат една по една. */
+  host: string;
   fetchOffers: () => Promise<StoreSnapshot>;
 }
 
