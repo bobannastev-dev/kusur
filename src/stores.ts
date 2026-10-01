@@ -10,16 +10,16 @@ const ZITO = "https://zito.proverkanaceni.mk/";
 const STOKOMAK = "https://stokomak.proverkanaceni.mk/";
 
 function zito(id: string, org: number, label: string): Store {
-  return { id, chain: "Жито", label, city: "Велес", host: new URL(ZITO).host, fetchOffers: () => fetchProverkaNaCeni(ZITO, org) };
+  return { id, chain: "Жито", label, city: "Велес", sourceId: String(org), host: new URL(ZITO).host, fetchOffers: () => fetchProverkaNaCeni(ZITO, org) };
 }
 
 function stokomak(id: string, org: number, label: string): Store {
-  return { id, chain: "Стокомак", label, city: "Велес", host: new URL(STOKOMAK).host, fetchOffers: () => fetchProverkaNaCeni(STOKOMAK, org) };
+  return { id, chain: "Стокомак", label, city: "Велес", sourceId: String(org), host: new URL(STOKOMAK).host, fetchOffers: () => fetchProverkaNaCeni(STOKOMAK, org) };
 }
 
 // КАМ: Id од ShopsWeb/LoadShopList; во листата сите се викаат „Велес", па името е по улица.
 function kam(shopId: number, label: string): Store {
-  return { id: `kam-veles-${shopId}`, chain: "КАМ", label, city: "Велес", host: "kam.com.mk", fetchOffers: () => fetchKam(shopId) };
+  return { id: `kam-veles-${shopId}`, chain: "КАМ", label, city: "Велес", sourceId: String(shopId), host: "kam.com.mk", fetchOffers: () => fetchKam(shopId) };
 }
 
 export const STORES: Store[] = [
@@ -45,6 +45,7 @@ export const STORES: Store[] = [
     chain: "Рамстор",
     label: "Рамстор Велес",
     city: "Велес",
+    sourceId: "ramstor-veles",
     host: "ramstore.com.mk",
     fetchOffers: () => fetchRamstore("https://ramstore.com.mk/marketi/ramstor-veles/"),
   },
