@@ -9,6 +9,8 @@ export interface ColumnMap {
   category: number;
   availability: number;
   regularPrice: number;
+  /** „Времетраење на промоција" — постои само во редовите со акција. */
+  promoUntil: number;
 }
 
 /**
@@ -29,5 +31,9 @@ export function rowToOffer(cells: string[], cols: ColumnMap): Offer | null {
     regularPrice: parsePrice(cells[cols.regularPrice] ?? ""),
     unitPriceText: (cells[cols.unitPrice] ?? "").trim(),
     category: (cells[cols.category] ?? "").trim(),
+    description: "",
+    // Рамстор го пишува рокот во повеќе редови. Категоријата не се нормализира:
+    // мапата на категории зависи од точниот текст („ГАЗИРАНА  ВОДА").
+    promoUntil: cells[cols.promoUntil]?.replace(/\s+/g, " ").trim() || null,
   };
 }

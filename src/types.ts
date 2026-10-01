@@ -11,6 +11,10 @@ export interface Offer {
   unitPriceText: string;
   /** Категорија според маркетот (колоната „Опис на стока"). */
   category: string;
+  /** „Опис на стока" кога маркетот таму пишува опис, а не категорија (КАМ); инаку празно. */
+  description: string;
+  /** Траење на акцијата како што е објавено („25.09.2026 до 09.10.2026"), без толкување. */
+  promoUntil: string | null;
 }
 
 export interface Store {

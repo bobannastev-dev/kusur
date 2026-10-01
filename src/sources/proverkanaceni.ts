@@ -19,28 +19,43 @@ const COLUMNS: ColumnMap = {
   category: 3,
   availability: 4,
   regularPrice: 5,
+  promoUntil: 8,
 };
+
+export interface ProverkaPage {
+  updatedAt: string | null;
+  offers: Offer[];
+  /** Број на редови во табелата, вклучително и оние што не станале понуда. */
+  rowCount: number;
+}
+
+/** Една страница од ценовникот, без мрежа — за тестови и за преземањето. */
+export function parseProverkaPage(html: string): ProverkaPage {
+  const $ = cheerio.load(html);
+  const updatedAt = /последно ажурирање на цените:\s*([\d/]+\s+[\d:]+)/.exec($.root().text())?.[1] ?? null;
+
+  const rows = $("table tbody tr").toArray();
+  const offers: Offer[] = [];
+  for (const tr of rows) {
+    const cells = $(tr).find("td").toArray().map((td) => $(td).text().trim());
+    const offer = rowToOffer(cells, COLUMNS);
+    if (offer) offers.push(offer);
+  }
+  return { updatedAt, offers, rowCount: rows.length };
+}
 
 export async function fetchProverkaNaCeni(baseUrl: string, org: number): Promise<StoreSnapshot> {
   const offers: Offer[] = [];
   let updatedAt: string | null = null;
 
   for (let page = 1; page <= MAX_PAGES; page++) {
-    const html = await fetchHtml(`${baseUrl}?org=${org}&perPage=${PER_PAGE}&page=${page}`);
-    const $ = cheerio.load(html);
-
-    updatedAt ??= /последно ажурирање на цените:\s*([\d/]+\s+[\d:]+)/.exec($.root().text())?.[1] ?? null;
-
-    const rows = $("table tbody tr").toArray();
-    for (const tr of rows) {
-      const cells = $(tr).find("td").toArray().map((td) => $(td).text().trim());
-      const offer = rowToOffer(cells, COLUMNS);
-      if (offer) offers.push(offer);
-    }
+    const parsed = parseProverkaPage(await fetchHtml(`${baseUrl}?org=${org}&perPage=${PER_PAGE}&page=${page}`));
+    updatedAt ??= parsed.updatedAt;
+    offers.push(...parsed.offers);
 
     // „Последна страница?" се одлучува по бројот на редови, не по бројот на
     // успешно парсирани понуди — ред без цена не смее да нè излаже.
-    if (rows.length < PER_PAGE) return { updatedAt, offers };
+    if (parsed.rowCount < PER_PAGE) return { updatedAt, offers };
     await sleep(REQUEST_DELAY_MS);
   }
 

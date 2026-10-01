@@ -13,10 +13,11 @@ const COLUMNS: ColumnMap = {
   category: 3,
   availability: 4,
   regularPrice: 5,
+  promoUntil: 9,
 };
 
-export async function fetchRamstore(storeUrl: string): Promise<StoreSnapshot> {
-  const html = await fetchHtml(storeUrl);
+/** Цел ценовник од една страница, без мрежа — за тестови и за преземањето. */
+export function parseRamstorePage(html: string): StoreSnapshot {
   const $ = cheerio.load(html);
 
   const updatedAt =
@@ -29,6 +30,14 @@ export async function fetchRamstore(storeUrl: string): Promise<StoreSnapshot> {
     if (offer) offers.push(offer);
   }
 
-  if (offers.length === 0) throw new Error(`${storeUrl}: табелата со цени е празна или е сменета`);
+  if (offers.length === 0) throw new Error("табелата со цени е празна или е сменета");
   return { updatedAt, offers };
+}
+
+export async function fetchRamstore(storeUrl: string): Promise<StoreSnapshot> {
+  try {
+    return parseRamstorePage(await fetchHtml(storeUrl));
+  } catch (err) {
+    throw new Error(`${storeUrl}: ${err instanceof Error ? err.message : err}`, { cause: err });
+  }
 }

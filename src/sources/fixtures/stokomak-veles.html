@@ -1,0 +1,664 @@
+<!DOCTYPE html><html lang="mk"><head>
+    <meta charset="UTF-8">
+    <title>Проверка на цени</title>
+    
+    
+</head>
+<body>
+
+
+
+
+<!-- <div class="container my-4">
+<div class="header d-flex align-items-center p-3" style="background-color:rgb(233 233 233);
+ color: black;">
+
+        <a href="index.php" style="margin-right: 24%;">
+    <img src="logo.png" alt="Logo" id="logo" style="height: 65px; margin-right: 19%;">
+    </a>
+ 
+    <h1 class="mb-0" style="font-size: 34px; font-weight: bold;">ПРОВЕРКА НА ЦЕНИ</h1>
+</div>
+    </div> -->
+
+
+<div class="container my-4">
+    <div class="card p-3 shadow-sm">
+        <form class="row g-3 align-items-center">
+            <div class="col-md-3">
+                <select name="org" class="form-select" onchange="this.form.submit()">
+                    <option value="">Одберете маркет</option>
+                                            <option value="1">
+                            КИСЕЛА ВОДА                        </option>
+                                            <option value="2">
+                            КУМАНОВО 2                        </option>
+                                            <option value="3">
+                            КАРПОШ 2                        </option>
+                                            <option value="4">
+                            АВТОКОМАНДА                        </option>
+                                            <option value="5">
+                            БУТЕЛ                        </option>
+                                            <option value="6">
+                            АЕРОДРОМ 2                        </option>
+                                            <option value="7">
+                            ТАФТАЛИЏЕ                        </option>
+                                            <option value="8">
+                            МЛЕЧЕН                        </option>
+                                            <option value="9">
+                            ОХРИД 1                        </option>
+                                            <option value="10">
+                            КУМАНОВО 3                        </option>
+                                            <option value="11">
+                            АЕРОДРОМ 1                        </option>
+                                            <option value="12">
+                            КАРПОШ 4                        </option>
+                                            <option value="13">
+                            СИНГЕЛИЧ                        </option>
+                                            <option value="14">
+                            ЦЕНТАР                        </option>
+                                            <option value="16">
+                            КАПИШТЕЦ                        </option>
+                                            <option value="17">
+                            ЃОРЧЕ ПЕТРОВ 2                        </option>
+                                            <option value="18">
+                            ДРАЧЕВО                        </option>
+                                            <option value="19">
+                            КУМАНОВО 1                        </option>
+                                            <option value="20">
+                            ВОДЊАНСКА                        </option>
+                                            <option value="21">
+                            БУЊАКОВЕЦ                        </option>
+                                            <option value="22">
+                            НОВО ЛИСИЧЕ                        </option>
+                                            <option value="23">
+                            ХИПОДРОМ                        </option>
+                                            <option value="24">
+                            РАСАДНИК                        </option>
+                                            <option value="25">
+                            НОВО ЛИСИЧЕ 2                        </option>
+                                            <option value="26">
+                            ТОПАНСКО ПОЛЕ                        </option>
+                                            <option value="27">
+                            ЧАИР                        </option>
+                                            <option value="28">
+                            КОЗЛЕ                        </option>
+                                            <option value="29">
+                            МИЧУРИН                        </option>
+                                            <option value="30">
+                            ШТИП                        </option>
+                                            <option value="31">
+                            ГОРЧЕ ДЕКСИОН                        </option>
+                                            <option value="32">
+                            ТЕТОВО                        </option>
+                                            <option value="33">
+                            СЕВЕР                        </option>
+                                            <option value="34">
+                            РАДИШАНИ                        </option>
+                                            <option value="35">
+                            ЧЕНТО 2                        </option>
+                                            <option value="36">
+                            ИЛИНДЕН                        </option>
+                                            <option value="37">
+                            КУМАНОВО 4                        </option>
+                                            <option value="38">
+                            ПРИЛЕП                        </option>
+                                            <option value="39">
+                            КОЧАНИ                        </option>
+                                            <option value="40">
+                            ТЕТОВО 2                        </option>
+                                            <option value="41" selected="">
+                            ВЕЛЕС                        </option>
+                                            <option value="42">
+                            НЕГОТИНО                        </option>
+                                            <option value="43">
+                            ВЛАЕ                        </option>
+                                            <option value="44">
+                            РЕСЕН                        </option>
+                                            <option value="45">
+                            ПРОБИШТИП                        </option>
+                                            <option value="46">
+                            ШТИП 2                        </option>
+                                            <option value="47">
+                            ГЕВГЕЛИЈА                        </option>
+                                            <option value="48">
+                            СТРУМИЦА                        </option>
+                                            <option value="49">
+                            ГОСТИВАР                        </option>
+                                            <option value="50">
+                            БИТОЛА                        </option>
+                                            <option value="51">
+                            ОХРИД  2                        </option>
+                                            <option value="52">
+                            РАДОВИШ                        </option>
+                                            <option value="53">
+                            БИТОЛА 2                        </option>
+                                            <option value="54">
+                            КИЧЕВО                        </option>
+                                            <option value="55">
+                            СТРУМИЦА 2                        </option>
+                                            <option value="56">
+                            КАВАДАРЦИ                        </option>
+                                            <option value="57">
+                            СТРУГА                        </option>
+                                            <option value="58">
+                            ДЕЛЧЕВО                        </option>
+                                            <option value="59">
+                            ВИНИЦА                        </option>
+                                            <option value="60">
+                            ТЕТОВО 3                        </option>
+                                            <option value="61">
+                            КРИВА ПАЛАНКА                        </option>
+                                            <option value="62">
+                            ПРИЛЕП 2                        </option>
+                                            <option value="63">
+                            КИСЕЛА ВОДА 2                        </option>
+                                            <option value="64">
+                            ПЕТРОВЕЦ                        </option>
+                                            <option value="65">
+                            ВЕЛЕС 2                        </option>
+                                            <option value="66">
+                            НОВОСЕЛСКИ ПАТ                        </option>
+                                            <option value="67">
+                            СВЕТИ НИКОЛЕ                        </option>
+                                            <option value="68">
+                            БЕРОВО                        </option>
+                                            <option value="69">
+                            КРАТОВО                        </option>
+                                            <option value="70">
+                            ДЕБАР                        </option>
+                                            <option value="71">
+                            ШТИП  3                        </option>
+                                            <option value="72">
+                            ДРАЧЕВО  2                        </option>
+                                            <option value="73">
+                            ВЛАЕ 2  АЛЕКСАНДРИЈА                        </option>
+                                            <option value="74">
+                            ЧАИР 2                        </option>
+                                            <option value="75">
+                            СТРУГА 2                        </option>
+                                            <option value="76">
+                            КУМАНОВО 5                        </option>
+                                            <option value="77">
+                            КОЧАНИ 2                        </option>
+                                            <option value="78">
+                            МАРКЕТ МАЏАРИ                        </option>
+                                            <option value="79">
+                            СТРУМИЦА 3                        </option>
+                                            <option value="80">
+                            МАК. КАМЕНИЦА                        </option>
+                                            <option value="81">
+                            ЈУЖЕН БУЛЕВАР                        </option>
+                                            <option value="82">
+                            МАРКЕТ ЗЛОКУЌАНИ                        </option>
+                                    </select>
+            </div>
+            <div class="col-md-5">
+                <input type="text" name="search" class="form-control" placeholder="Пребарај по име" value="">
+            </div>
+            <div class="col-md-2">
+                <select name="perPage" class="form-select" onchange="this.form.submit()">
+                                            <option value="10">
+                            10 / страница
+                        </option>
+                                            <option value="20">
+                            20 / страница
+                        </option>
+                                            <option value="50">
+                            50 / страница
+                        </option>
+                                            <option value="100" selected="">
+                            100 / страница
+                        </option>
+                                    </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary" style="background-color:#fcd900!important; color:black!important;">Пребарај</button>
+            </div>
+        </form>
+
+                    <p class="text-muted">
+    Прикажи 1 - 100 од 2610 артикли
+</p>
+		<span>Датум и време на последно ажурирање на цените: 
+            01/10/2026 21:05</span>
+            <div class="table-responsive">
+                                <table class="table table-bordered table-striped table-hover">
+                    <thead class="table-light" style="font-size:15px;">
+                        <tr>
+                                                        <th rowspan="2">Назив на стока-производ</th>
+                                                        <th rowspan="2">Продажна цена</th>
+                                                        <th rowspan="2">Единечна цена</th>
+                                                        <th rowspan="2">Опис на стока</th>
+                            <th rowspan="2">Достапност во продажен објект</th>
+                            <th rowspan="2">Редовна цена </th>
+                            
+                            
+                        
+                                                        <th colspan="3" id="col">Промотивна или попустна цена</th>
+                        
+
+                            
+                        </tr>
+                        <tr>
+
+                        <th id="col">Цена со попуст</th>
+                        <th id="col">Вид на продажно поттикнување</th>
+                        <th id="col">Времетраење на промоција</th>
+                            </tr>
+                                                </thead>
+                    <tbody style="font-size:14px;">
+                        <!-- test -->
+
+                                                                                <tr>
+                                                                    <td>КОРИ ЗА ПИТА И БАКЛАВА 500гр. ДОМАШНИ</td>
+                                                                        <td>
+                                    71 ден.
+                                    </td>
+                                                                        <td>
+                                        1кгр = 142.00 ден.
+                                    </td>
+                                                                        <td>
+                                    СВЕЖИ КОРИ                                    </td>
+                                    <td>
+                                    Да                                    </td>
+
+                                 
+                                 <td>
+                                 71 ден.
+                                 </td>
+                                                                                                                                      </tr>
+                                                            <tr>
+                                                                    <td>ПИВАРКА ПОСНА300гр. ВАФЛИНИ</td>
+                                                                        <td>
+                                    64 ден.
+                                    </td>
+                                                                        <td>
+                                        1кгр = 256.00 ден.
+                                    </td>
+                                                                        <td>
+                                    КОЛАЧИ СВЕЖИ                                    </td>
+                                    <td>
+                                    Да                                    </td>
+
+                                 
+                                 <td>
+                                 64 ден.
+                                 </td>
+                                                                                                                                      </tr>
+                                                            <tr>
+                                                                    <td>БИОЛОШКИ ЛЕБ 400гр</td>
+                                                                        <td>
+                                    35 ден.
+                                    </td>
+                                                                        <td>
+                                        1кгр = 87.50 ден.
+                                    </td>
+                                                                        <td>
+                                    ЛЕБОВИ                                    </td>
+                                    <td>
+                                    Да                                    </td>
+
+                                 
+                                 <td>
+                                 35 ден.
+                                 </td>
+                                                                                                                                      </tr>
+                                                            <tr>
+                                                                    <td>РЖАН ЛЕБ 400гр</td>
+                                                                        <td>
+                                    35 ден.
+                                    </td>
+                                                                        <td>
+                                        1кгр = 87.50 ден.
+                                    </td>
+                                                                        <td>
+                                    ЛЕБОВИ                                    </td>
+                                    <td>
+                                    Да                                    </td>
+
+                                 
+                                 <td>
+                                 35 ден.
+                                 </td>
+                                                                                                                                      </tr>
+                                                            <tr>
+                                                                    <td>ИНТЕГРАЛЕН ЛЕБ 400гр</td>
+                                                                        <td>
+                                    35 ден.
+                                    </td>
+                                                                        <td>
+                                        1кгр = 87.50 ден.
+                                    </td>
+                                                                        <td>
+                                    ЛЕБОВИ                                    </td>
+                                    <td>
+                                    Да                                    </td>
+
+                                 
+                                 <td>
+                                 35 ден.
+                                 </td>
+                                                                                                                                      </tr>
+                                                            <tr>
+                                                                    <td>ЛЕБ ДИЕТ 500гр.</td>
+                                                                        <td>
+                                    42 ден.
+                                    </td>
+                                                                        <td>
+                                        1кгр = 84.00 ден.
+                                    </td>
+                                                                        <td>
+                                    ЛЕБОВИ                                    </td>
+                                    <td>
+                                    Да                                    </td>
+
+                                 
+                                 <td>
+                                 42 ден.
+                                 </td>
+                                                                                                                                      </tr>
+                                                            <tr>
+                                                                    <td>ЛИСНАТИ КИФЛИ 350ГР</td>
+                                                                        <td>
+                                    67 ден.
+                                    </td>
+                                                                        <td>
+                                        1кгр = 191.43 ден.
+                                    </td>
+                                                                        <td>
+                                    ЛЕБОВИ                                    </td>
+                                    <td>
+                                    Да                                    </td>
+
+                                 
+                                 <td>
+                                 67 ден.
+                                 </td>
+                                                                                                                                      </tr>
+                                                            <tr>
+                                                                    <td>ВАНИЛИЦИ СО ЏЕМ ОД ШУМСКО ОВОШЈЕ 350ГР</td>
+                                                                        <td>
+                                    82 ден.
+                                    </td>
+                                                                        <td>
+                                        1кгр = 234.29 ден.
+                                    </td>
+                                                                        <td>
+                                    ПЕЦИВА ЧАЈНИ                                    </td>
+                                    <td>
+                                    Да                                    </td>
+
+                                 
+                                 <td>
+                                 82 ден.
+                                 </td>
+                                                                                                                                      </tr>
+                                                            <tr>
+                                                                    <td>КРУША /кгр сорта: ВИЛЈАМОВКА</td>
+                                                                        <td>
+                                    89 ден.
+                                    </td>
+                                                                        <td>
+                                        1кгр = 89.00 ден.
+                                    </td>
+                                                                        <td>
+                                    СВЕЖО ОВОШЈЕ                                    </td>
+                                    <td>
+                                    Да                                    </td>
+
+                                 
+                                 <td>
+                                 89 ден.
+                                 </td>
+                                                                                                                                      </tr>
+                                                            <tr>
+                                                                    <td>ЛЕБ ДОМАШЕН 470гр.</td>
+                                                                        <td>
+                                    41 ден.
+                                    </td>
+                                                                        <td>
+                                        1кгр = 87.23 ден.
+                                    </td>
+                                                                        <td>
+                                    ЛЕБОВИ                                    </td>
+                                    <td>
+                                    Да                                    </td>
+
+                                 
+                                 <td>
+                                 41 ден.
+                                 </td>
+                                                                                                                                      </tr>
+                                                            <tr>
+                                                                    <td>ЈАБОЛКО СОРТА ГРЕНИ СМИТ кгр</td>
+                                                                        <td>
+                                    75 ден.
+                                    </td>
+                                                                        <td>
+                                        1кгр = 75.00 ден.
+                                    </td>
+                                                                        <td>
+                                    СВЕЖО ОВОШЈЕ                                    </td>
+                                    <td>
+                                    Да                                    </td>
+
+                                 
+                                 <td>
+                                 75 ден.
+                                 </td>
+                                                                                                                                      </tr>
+                                                            <tr>
+                                                                    <td>ЈАБОЛКА СОРТА ЗЛАТЕН ДЕЛИШЕС кгр</td>
+                                                                        <td>
+                                    75 ден.
+                                    </td>
+                                                                        <td>
+                                        1кгр = 75.00 ден.
+                                    </td>
+                                                                        <td>
+                                    СВЕЖО ОВОШЈЕ                                    </td>
+                                    <td>
+                                    Да                                    </td>
+
+                                 
+                                 <td>
+                                 75 ден.
+                                 </td>
+                                                                                                                                      </tr>
+                                                            
+                                                            
+                                                            
+                                                            <tr>
+                                                                    <td>МОРКОВ ПАКУВАН 1кгр. КЕСА</td>
+                                                                        <td>
+                                    33 ден.
+                                    </td>
+                                                                        <td>
+                                        1кгр = 33.00 ден.
+                                    </td>
+                                                                        <td>
+                                    СВЕЖ ЗЕЛЕНЧУК                                    </td>
+                                    <td>
+                                    Да                                    </td>
+
+                                 
+                                 <td>
+                                 40 ден.
+                                 </td>
+                                                                                                         
+                                    <td headers="col">
+                                        <!-- Цена со попуст: -->
+                                    33 ден.
+                                    <br>
+                                Попуст:18%
+
+                                    </td>
+                                    <td headers="col">
+                                        <!-- Понуда: -->
+                                    акциска цена 
+                                     
+                                    </td>
+                                    <td headers="col">
+                                    <span> 25.09.2026 до <br>01.10.2026</span>
+                                    </td>
+                                                                                                        </tr>
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            <tr>
+                                                                    <td>БАНАНИ СОРТА КАВЕНДИШ кгр РЕФУС</td>
+                                                                        <td>
+                                    56 ден.
+                                    </td>
+                                                                        <td>
+                                        1кгр = 56.00 ден.
+                                    </td>
+                                                                        <td>
+                                    СВЕЖО ОВОШЈЕ                                    </td>
+                                    <td>
+                                    Да                                    </td>
+
+                                 
+                                 <td>
+                                 65 ден.
+                                 </td>
+                                                                                                         
+                                    <td headers="col">
+                                        <!-- Цена со попуст: -->
+                                    56 ден.
+                                    <br>
+                                Попуст:14%
+
+                                    </td>
+                                    <td headers="col">
+                                        <!-- Понуда: -->
+                                    акциска цена 
+                                     
+                                    </td>
+                                    <td headers="col">
+                                    <span> 28.09.2026 до <br>01.10.2026</span>
+                                    </td>
+                                                                                                        </tr>
+                                                            
+                                                            <tr>
+                                                                    <td>ЛИМОН СВЕЖ КГР</td>
+                                                                        <td>
+                                    39 ден.
+                                    </td>
+                                                                        <td>
+                                        1кгр = 39.00 ден.
+                                    </td>
+                                                                        <td>
+                                    СВЕЖО ОВОШЈЕ                                    </td>
+                                    <td>
+                                    Да                                    </td>
+
+                                 
+                                 <td>
+                                 79 ден.
+                                 </td>
+                                                                                                         
+                                    <td headers="col">
+                                        <!-- Цена со попуст: -->
+                                    39 ден.
+                                    <br>
+                                Попуст:51%
+
+                                    </td>
+                                    <td headers="col">
+                                        <!-- Понуда: -->
+                                    акциска цена 
+                                     
+                                    </td>
+                                    <td headers="col">
+                                    <span> 28.09.2026 до <br>04.10.2026</span>
+                                    </td>
+                                                                                                        </tr>
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                                        </tbody>
+                </table>
+            </div>
+
+            <nav class="d-flex justify-content-center"><ul class="pagination"><li class="page-item active"><a class="page-link" href="?page=1&amp;perPage=100&amp;search=&amp;org=41">1</a></li><li class="page-item "><a class="page-link" href="?page=2&amp;perPage=100&amp;search=&amp;org=41">2</a></li><li class="page-item "><a class="page-link" href="?page=3&amp;perPage=100&amp;search=&amp;org=41">3</a></li><li class="page-item disabled"><span class="page-link">...</span></li><li class="page-item"><a class="page-link" href="?page=27&amp;perPage=100&amp;search=&amp;org=41">27</a></li><li class="page-item"><a class="page-link" href="?page=2&amp;perPage=100&amp;search=&amp;org=41">»</a></li></ul></nav>            </div>
+</div>
+
+
+
+</body></html>
