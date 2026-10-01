@@ -59,4 +59,6 @@ export const STORES: Store[] = [
 export const IGNORED_STORES = [
   { chain: "Жито", sourceId: 10, label: "Жито Ване Кат", reason: "само непрехрана (облека, галантерија), ~4.200 производи" },
   { chain: "Жито", sourceId: 55, label: "Жито Којник", reason: "празен ценовник (0 производи на 2026-10-01)" },
+  { chain: "Жито", sourceId: 78, label: "Ла Фамилиа Велес", reason: "главно непрехрана; изоставена со одлука (Checkpoint 2, 2026-10-01)" },
+  { chain: "Жито", sourceId: 83, label: "Жито Дос Велес", reason: "изоставена со одлука (Checkpoint 2, 2026-10-01), иако има храна" },
 ];
