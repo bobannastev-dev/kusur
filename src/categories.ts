@@ -60,7 +60,8 @@ for (const type of CATALOG) {
   if (counts.every((c) => c === 0)) empty.push(type.label);
 }
 
-// 3. Сомнителни мапирања (само мапата на категории)
+// 3. Сомнителни мапирања: категорија од која ниеден производ не поминал правилата,
+//    или производ (КАМ) мапиран на тип што правилата го одбиваат.
 const suspicious: string[] = [];
 for (const store of snapshots.filter((s) => !mapsByProduct(TYPE_MAPS, s.chain))) {
   const byCategory = Map.groupBy(store.offers, (o) => o.category);
@@ -72,6 +73,15 @@ for (const store of snapshots.filter((s) => !mapsByProduct(TYPE_MAPS, s.chain)))
       if (!offers.some((o) => matchesType(o, store.chain, type))) {
         suspicious.push(`${store.chain} :: "${category}" → ${id} (${offers.length} производи, ниеден не поминал)`);
       }
+    }
+  }
+}
+// Кај мапата на производи: запис со тип што правилата по име го одбиваат нема ефект.
+for (const store of snapshots.filter((s) => mapsByProduct(TYPE_MAPS, s.chain))) {
+  for (const o of store.offers) {
+    for (const id of reviewedTypes(TYPE_MAPS, store.chain, o) ?? []) {
+      const type = CATALOG.find((t) => t.id === id)!;
+      if (!matchesType(o, store.chain, type)) suspicious.push(`${store.chain} :: „${o.name}" → ${id} (правилата по име го одбиваат)`);
     }
   }
 }
