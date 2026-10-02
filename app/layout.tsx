@@ -3,7 +3,9 @@ import { Onest, Unbounded } from "next/font/google";
 import type { ReactNode } from "react";
 import { BottomNav } from "./components/BottomNav.tsx";
 import { ServiceWorker } from "./components/ServiceWorker.tsx";
+import { TopBar } from "./components/TopBar.tsx";
 import { PriceDataProvider } from "./lib/data.tsx";
+import { THEME_BOOT_SCRIPT } from "./lib/theme-script.ts";
 import "./globals.css";
 
 // Двата фонта имаат кирилица; Next ги хостира заедно со апликацијата.
@@ -29,9 +31,14 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="mk" className={`${text.variable} ${display.variable}`}>
+    // data-theme го поставува скриптата пред React, па атрибутот смее да се разликува.
+    <html lang="mk" className={`${text.variable} ${display.variable}`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
+      </head>
       <body>
         <PriceDataProvider>
+          <TopBar />
           {children}
           <BottomNav />
           <ServiceWorker />

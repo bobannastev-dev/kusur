@@ -11,6 +11,8 @@ export const KEYS = {
   followed: "followed",
   /** Датумот на пакетот при претходното отворање на „Поевтинето". */
   lastVisit: "lastVisit",
+  /** Тема: „system" (по телефонот), „light" или „dark". */
+  theme: "theme",
 } as const;
 
 export function load<T>(key: string, fallback: T): T {

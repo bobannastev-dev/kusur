@@ -24,8 +24,10 @@
   color-scheme: light;
 }
 
+/* Темна тема: по телефонот (ако корисникот не избрал „Светла"), или избрана рачно
+   во Поставки (data-theme на <html>, го поставува скриптата во layout пред цртањето). */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --ink: #fff4ea;
     --ink-soft: #e8cdb8;
     --muted: #c9a991;
@@ -47,6 +49,29 @@
     --glow-3: #4c3a52;
     color-scheme: dark;
   }
+}
+
+:root[data-theme="dark"] {
+  --ink: #fff4ea;
+  --ink-soft: #e8cdb8;
+  --muted: #c9a991;
+  --glass: rgba(255, 255, 255, 0.09);
+  --glass-strong: rgba(255, 255, 255, 0.15);
+  --line: rgba(255, 255, 255, 0.14);
+  --accent: #fb923c;
+  --accent-ink: #2a1206;
+  --good: #86efac;
+  --good-bg: rgba(134, 239, 172, 0.14);
+  --bar: rgba(255, 255, 255, 0.22);
+  --bar-best: #fb923c;
+  --nav: rgba(40, 26, 22, 0.72);
+  --pill: #fff4ea;
+  --pill-ink: #2a1206;
+  --base: #1c1411;
+  --glow-1: #7c2d12;
+  --glow-2: #9a3412;
+  --glow-3: #4c3a52;
+  color-scheme: dark;
 }
 
 * {
@@ -88,7 +113,7 @@ button {
 .page {
   max-width: 480px;
   margin: 0 auto;
-  padding: 22px 20px 120px;
+  padding: 6px 20px 120px;
   display: flex;
   flex-direction: column;
   gap: 18px;
