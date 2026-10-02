@@ -7,7 +7,7 @@
 
 import { getDocument } from "pdfjs-dist/legacy/build/pdf.mjs";
 import type { TextItem } from "pdfjs-dist/types/src/display/api.js";
-import { fetchBytes, postJson } from "../net.ts";
+import { fetchBytes, postJson, REQUEST_DELAY_MS, sleep } from "../net.ts";
 import { parsePrice } from "../parse.ts";
 import type { Offer, StoreSnapshot } from "../types.ts";
 
@@ -124,7 +124,8 @@ function parsePage(items: TextItem[]): { offers: Offer[]; rowCount: number; text
 }
 
 export async function parseKamPdf(data: Uint8Array): Promise<KamPage> {
-  const task = getDocument({ data, verbosity: 0 });
+  // PDF-от доаѓа однадвор: фонтовите не се вчитуваат (ни требаат само текстот и позициите).
+  const task = getDocument({ data, verbosity: 0, disableFontFace: true });
   const doc = await task.promise;
   try {
     const offers: Offer[] = [];
@@ -160,12 +161,16 @@ export function kamPricelistUrl(shops: unknown, shopId: number): string {
   if (!shop) throw new Error(`КАМ: нема продавница ${shopId} во листата`);
   const path = (shop as { ShopFiles?: { RelativePath?: unknown }[] }).ShopFiles?.[0]?.RelativePath;
   if (typeof path !== "string" || !path.endsWith(".pdf")) throw new Error(`КАМ: продавницата ${shopId} нема ценовник`);
-  return new URL(path, KAM_BASE).href;
+  // Патеката доаѓа однадвор: апсолутна адреса („https://…“, „//…“) би нè однела на друг сервер.
+  const url = new URL(path, KAM_BASE);
+  if (url.origin !== new URL(KAM_BASE).origin) throw new Error(`КАМ: ценовникот на продавницата ${shopId} е на друг сервер (${url.origin})`);
+  return url.href;
 }
 
 /** Цел ценовник на една продавница на КАМ: листа продавници → PDF → редови. */
 export async function fetchKam(shopId: number): Promise<StoreSnapshot> {
   const url = kamPricelistUrl(await postJson(new URL("ShopsWeb/LoadShopList", KAM_BASE).href, null), shopId);
+  await sleep(REQUEST_DELAY_MS); // двете барања се кон ист сервер
   const { updatedAt, offers } = await parseKamPdf(await fetchBytes(url));
   return { updatedAt, offers };
 }

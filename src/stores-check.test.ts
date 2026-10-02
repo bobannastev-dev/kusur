@@ -32,6 +32,11 @@ test("КАМ: продавници од ShopsWeb/LoadShopList", () => {
   assert.deepEqual(veles(parseKamStores(JSON.parse(fixture("kam-shops.json")))), ["40", "94", "61"]);
 });
 
+test("КАМ: празни или чудни елементи во листата не ја рушат проверката", () => {
+  const stores = parseKamStores([null, 7, { Id: 40, Name: "Велес", Address: "ул. 8ми Септември", City: "Велес" }]);
+  assert.deepEqual(stores.map((s) => [s.sourceId, s.inVeles]), [["40", true]]);
+});
+
 test("споредба со регистарот: нови, исчезнати, изоставени", () => {
   const found: SourceStore[] = [
     { sourceId: "2", label: "2 Трговски - Велес", inVeles: true },

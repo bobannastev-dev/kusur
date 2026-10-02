@@ -60,3 +60,10 @@ test("КАМ: непозната продавница или продавниц�
   assert.throws(() => kamPricelistUrl([{ Id: 7, Name: "Тест", ShopFiles: [] }], 7), /нема ценовник/);
   assert.throws(() => kamPricelistUrl({ error: "x" }, 40), /неочекуван одговор/);
 });
+
+test("КАМ: ценовник од друг сервер се одбива", () => {
+  const foreign = (RelativePath: string) => [{ Id: 1, Name: "Тест", ShopFiles: [{ RelativePath }] }];
+  assert.throws(() => kamPricelistUrl(foreign("https://evil.example/x.pdf"), 1), /друг сервер/);
+  assert.throws(() => kamPricelistUrl(foreign("//evil.example/x.pdf"), 1), /друг сервер/);
+  assert.equal(kamPricelistUrl(foreign("2026/10/02/1.pdf"), 1), "https://kam.com.mk/2026/10/02/1.pdf");
+});

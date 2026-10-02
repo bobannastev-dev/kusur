@@ -41,11 +41,14 @@ export function parseRamstoreStores(html: string): SourceStore[] {
 /** КАМ: одговорот од ShopsWeb/LoadShopList. */
 export function parseKamStores(shops: unknown): SourceStore[] {
   if (!Array.isArray(shops)) throw new Error("КАМ: неочекуван одговор од листата продавници");
-  return shops.map((s: { Id?: unknown; Name?: unknown; Address?: unknown; City?: unknown }) => ({
-    sourceId: String(s.Id),
-    label: `${s.Name ?? ""} (${s.Address ?? ""})`,
-    inVeles: VELES.test(String(s.City ?? "")),
-  }));
+  type Shop = { Id?: unknown; Name?: unknown; Address?: unknown; City?: unknown };
+  return shops
+    .filter((s): s is Shop => !!s && typeof s === "object" && (s as Shop).Id !== undefined)
+    .map((s) => ({
+      sourceId: String(s.Id),
+      label: `${s.Name ?? ""} (${s.Address ?? ""})`,
+      inVeles: VELES.test(String(s.City ?? "")),
+    }));
 }
 
 export interface RegistryComparison {
