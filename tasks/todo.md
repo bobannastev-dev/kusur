@@ -8,7 +8,7 @@
 
 ## Фаза 1: Податоци за телефонот
 
-- [ ] **Задача 1: Логика без `node:fs`**
+- [x] **Задача 1: Логика без `node:fs`**
   - Опис: `cheapestFromCandidates(candidates, need)` и кошничка преку извор на кандидати (`compareBasketWith(stores, lines, maxStores, candidatesFor)`); `dropsSince` / `promoCheck` без увоз на мапите. Постојните `cheapestPurchase`, `compareBasket`, `dropsSince` остануваат со ист потпис (тенки обвивки).
   - Прифаќање:
     - Тест: модулите за телефонот не увезуваат (ни посредно) `node:fs`, `category-map.ts`, `product-map.ts`.
@@ -17,6 +17,7 @@
   - Зависи од: —
   - Фајлови: `src/match.ts`, `src/basket.ts`, `src/history.ts`, нов `src/purchase.ts` (или сл.), тест
   - Обем: M
+  - Направено: без нов модул. `category-map.ts` / `product-map.ts` се само типови; мапите ги чита `defaultTypeMaps()` (type-maps.ts) на првото користење преку `process.getBuiltinModule`, без статички `node:fs`. Нови: `cheapestFromCandidates`, `compareBasketWith(…, candidatesFor)`, `dropsSinceWith(…, candidatesFor)`; старите функции се обвивки. Тест `browser-safe.test.ts` ги следи увозите.
 
 - [ ] **Задача 2: `npm run build-data`**
   - Опис: `src/publish/`: за секој тип × продавница кандидатите (име, цена, редовна, вид на акција, количина, на мерење) + серијата на цени; `stores.json` (продавница, синџир, број, ажурирано, застарено); верзија и датум. Читач на пакетот за телефонот (`fromBundle`) што ги враќа кандидатите во облик за задача 1.

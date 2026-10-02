@@ -1,8 +1,8 @@
 // Кој тип е ред од ценовникот според прегледаните мапи: синџир со мапа на производи
 // (КАМ) се гледа по име на производ, другите по категорија. Двете не се мешаат.
 
-import { CATEGORY_MAP, type CategoryMap } from "./category-map.ts";
-import { PRODUCT_MAP, type ProductMap } from "./product-map.ts";
+import type { CategoryMap } from "./category-map.ts";
+import type { ProductMap } from "./product-map.ts";
 import type { Offer } from "./types.ts";
 
 export interface TypeMaps {
@@ -10,7 +10,21 @@ export interface TypeMaps {
   products: ProductMap;
 }
 
-export const TYPE_MAPS: TypeMaps = { categories: CATEGORY_MAP, products: PRODUCT_MAP };
+let loaded: TypeMaps | undefined;
+
+/**
+ * Мапите од `data/` (category-map.json, product-map.json). Само во Node (командите,
+ * build-data): се читаат на првото користење, без статички увоз на `node:fs`, за
+ * модулите да можат да се вчитаат и во прелистувач (каде се праќаат готови кандидати).
+ */
+export function defaultTypeMaps(): TypeMaps {
+  if (loaded) return loaded;
+  const fs = process.getBuiltinModule("node:fs");
+  const path = process.getBuiltinModule("node:path");
+  const read = (file: string) => JSON.parse(fs.readFileSync(path.join(import.meta.dirname, "..", "data", file), "utf8"));
+  loaded = { categories: read("category-map.json"), products: read("product-map.json") };
+  return loaded;
+}
 
 /** Дали синџирот се мапира по производ, а не по категорија. */
 export function mapsByProduct(maps: TypeMaps, chain: string): boolean {

@@ -10,7 +10,9 @@ import { loadCurrentSnapshots } from "./price-store.ts";
 import { createFilePriceStore } from "./price-store-file.ts";
 import { proposeTypes } from "./propose.ts";
 import { STORES } from "./stores.ts";
-import { mapsByProduct, reviewedTypes, TYPE_MAPS } from "./type-maps.ts";
+import { defaultTypeMaps, mapsByProduct, reviewedTypes } from "./type-maps.ts";
+
+const TYPE_MAPS = defaultTypeMaps();
 
 const REVIEW_DIR = path.join(import.meta.dirname, "..", "data", "review");
 

@@ -2,8 +2,9 @@
 // и дали вреди да се подели на повеќе продавници.
 
 import type { BasketLine } from "./list.ts";
-import { cheapestPurchase, type Purchase } from "./match.ts";
-import { TYPE_MAPS, type TypeMaps } from "./type-maps.ts";
+import type { ProductType } from "./catalog.ts";
+import { cheapestFromCandidates, findCandidates, type Candidate, type Purchase } from "./match.ts";
+import { defaultTypeMaps, type TypeMaps } from "./type-maps.ts";
 import type { SnapshotFile } from "./types.ts";
 
 export interface PlanItem {
@@ -67,10 +68,22 @@ export function compareBasket(
   stores: SnapshotFile[],
   lines: BasketLine[],
   maxStores = 2,
-  maps: TypeMaps = TYPE_MAPS,
+  maps: TypeMaps = defaultTypeMaps(),
+): BasketComparison {
+  return compareBasketWith(stores, lines, maxStores, (store, type) => findCandidates(store, type, maps));
+}
+
+/** Кандидатите за тип во продавница: од ценовникот (командите) или од пакетот (телефонот). */
+export type CandidateSource = (store: SnapshotFile, type: ProductType) => Candidate[];
+
+export function compareBasketWith(
+  stores: SnapshotFile[],
+  lines: BasketLine[],
+  maxStores: number,
+  candidatesFor: CandidateSource,
 ): BasketComparison {
   const grid: PurchaseGrid = new Map(
-    stores.map((s) => [s, lines.map((line) => cheapestPurchase(s, line.type, line.need, maps))]),
+    stores.map((s) => [s, lines.map((line) => cheapestFromCandidates(candidatesFor(s, line.type), line.need))]),
   );
 
   const single = stores.map((s) => planFor([s], lines, grid)).sort((a, b) => (isBetter(a, b) ? -1 : 1));

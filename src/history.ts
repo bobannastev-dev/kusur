@@ -5,7 +5,7 @@ import type { ProductType } from "./catalog.ts";
 import { addDays } from "./dates.ts";
 import { comparisonPrice, findCandidates, type Candidate } from "./match.ts";
 import type { ChangesRecord } from "./price-store.ts";
-import { TYPE_MAPS, type TypeMaps } from "./type-maps.ts";
+import { defaultTypeMaps, type TypeMaps } from "./type-maps.ts";
 import type { Offer, SnapshotFile } from "./types.ts";
 
 /** Набљудување: цената тој ден, или null ако производот го немало. */
@@ -157,7 +157,20 @@ function cheaper(a: UnitBest | null, b: UnitBest): UnitBest {
  * ред (или последниот познат за производ што исчезнал) — историската цена се
  * дели со неа, бидејќи единечната цена во ценовникот важи за денешната цена.
  */
-export function dropsSince(stores: StoreHistory[], types: ProductType[], since: string, maps: TypeMaps = TYPE_MAPS): TypeDrops[] {
+export function dropsSince(stores: StoreHistory[], types: ProductType[], since: string, maps: TypeMaps = defaultTypeMaps()): TypeDrops[] {
+  return dropsSinceWith(stores, types, since, (store, type) => findCandidates(store, type, maps));
+}
+
+/**
+ * Исто како `dropsSince`, со кандидати од извор (телефонот: од пакетот). Изворот ја
+ * добива снимката проширена со исчезнатите производи (последниот познат ред).
+ */
+export function dropsSinceWith(
+  stores: StoreHistory[],
+  types: ProductType[],
+  since: string,
+  candidatesFor: (known: SnapshotFile, type: ProductType) => Candidate[],
+): TypeDrops[] {
   const start = stores.map(historyStart).sort()[0] ?? since;
   const effective = since < start ? start : since;
 
@@ -177,7 +190,7 @@ export function dropsSince(stores: StoreHistory[], types: ProductType[], since: 
     let now: UnitBest | null = null;
 
     for (const { h, series, current, known } of prepared) {
-      for (const c of findCandidates(known, type, maps)) {
+      for (const c of candidatesFor(known, type)) {
         const oldPrice = priceOn(series.get(c.offer.name) ?? [], effective, "comparable");
         if (oldPrice !== null) then = cheaper(then, { store: h.snapshot, offer: c.offer, unitPrice: unitOf(c, oldPrice) });
         if (!current.has(c.offer.name)) continue;

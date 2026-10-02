@@ -3,8 +3,9 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { CATALOG, TYPES_BY_ID } from "./catalog.ts";
-import { CATEGORY_MAP } from "./category-map.ts";
-import { PRODUCT_MAP } from "./product-map.ts";
+import { defaultTypeMaps } from "./type-maps.ts";
+
+const { categories: CATEGORY_MAP, products: PRODUCT_MAP } = defaultTypeMaps();
 
 const mapped = Object.entries(CATEGORY_MAP).flatMap(([chain, cats]) =>
   Object.entries(cats).map(([category, types]) => ({ chain, category, types })),
