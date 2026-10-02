@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import type { PriceChange } from "./changes.ts";
 import { CATALOG } from "./catalog.ts";
-import { dropsSince, priceOn, priceSeries, type StoreHistory } from "./history.ts";
+import { dropsSince, priceOn, priceSeries, promoCheck, type PricePoint, type StoreHistory } from "./history.ts";
 import type { ChangesRecord } from "./price-store.ts";
 import type { TypeMaps } from "./type-maps.ts";
 import type { Offer, SnapshotFile } from "./types.ts";
@@ -111,4 +111,53 @@ test("поевтинето: датум пред почетокот на исто
   ]);
   const [result] = dropsSince([h], [mleko], "2025-06-01", MAPS);
   assert.deepEqual([result.since, result.sinceAdjusted, result.drops.length], ["2026-01-04", true, 1]);
+});
+
+// ── Вистинска акција ──
+
+/** Серија од парови [ден од 2026-01-01, цена]: цената важи од тој ден. */
+const days = (...pairs: [number, number][]): PricePoint[] =>
+  pairs.map(([day, price]) => ({ date: new Date(Date.UTC(2026, 0, 1 + day)).toISOString().slice(0, 10), price }));
+const DAY_40 = "2026-02-10"; // ден 40
+const START = "2026-01-01";
+
+test("акција: вистинска — пониска од најниската во 30-те дена пред неа", () => {
+  const series = days([0, 100], [40, 80]);
+  const r = promoCheck(milk("М", 80, { regularPrice: 100 }), series, START);
+  assert.deepEqual([r.verdict, r.promoStart, r.lowestBefore, r.loyalty], ["genuine", DAY_40, 100, false]);
+});
+
+test("акција: не е пониска — пред две недели чинело исто", () => {
+  const series = days([0, 80], [26, 100], [40, 80]);
+  const r = promoCheck(milk("М", 80, { regularPrice: 100 }), series, START);
+  assert.deepEqual([r.verdict, r.lowestBefore], ["not-lower", 80]);
+});
+
+test("акција: редовната цена е кренана пред попустот", () => {
+  const series = days([0, 100], [35, 120], [40, 95]);
+  const r = promoCheck(milk("М", 95, { regularPrice: 120 }), series, START);
+  assert.deepEqual([r.verdict, r.lowestBefore], ["regular-raised", 100]);
+});
+
+test("акција: нема доволно историја (10 дена пред акцијата)", () => {
+  const series = days([30, 100], [40, 80]);
+  const r = promoCheck(milk("М", 80, { regularPrice: 100 }), series, "2026-01-31");
+  assert.equal(r.verdict, "insufficient");
+});
+
+test("акција: клуб-цената носи ознака; производ без акција не се проверува", () => {
+  const series = days([0, 55], [40, 45]);
+  const club = promoCheck(milk("М", 45, { regularPrice: 55, promoKind: "ЛОЈАЛНОСТ" }), series, START);
+  assert.deepEqual([club.verdict, club.loyalty], ["genuine", true]);
+  assert.equal(promoCheck(milk("М", 55), days([0, 55]), START).verdict, "not-on-promo");
+});
+
+test("акција: иста акциска цена уште од почетокот на историјата", () => {
+  // Производот без промени: една точка (денешната снимка) — акцијата трае од пред историјата.
+  const today = "2026-02-10";
+  const offerOnPromo = milk("М", 80, { regularPrice: 100 });
+  const longHistory = promoCheck(offerOnPromo, [{ date: today, price: 80 }], START);
+  assert.deepEqual([longHistory.verdict, longHistory.promoStart, longHistory.lowestBefore], ["not-lower", START, 80]);
+  const shortHistory = promoCheck(offerOnPromo, [{ date: today, price: 80 }], "2026-02-01");
+  assert.equal(shortHistory.verdict, "insufficient");
 });

@@ -170,3 +170,84 @@ export function dropsSince(stores: StoreHistory[], types: ProductType[], since: 
     return { type, since: effective, sinceAdjusted: effective !== since, drops, cheapest: { then, now, dropped } };
   });
 }
+
+// ── Вистинска акција ──
+
+/** Колку дена пред акцијата се гледа најниската цена (како правилото на ЕУ за попусти). */
+export const PROMO_LOOKBACK_DAYS = 30;
+
+export type PromoVerdict =
+  /** Акциската цена е пониска од најниската во 30-те дена пред акцијата. */
+  | "genuine"
+  /** Во 30-те дена пред акцијата цената била иста или пониска. */
+  | "not-lower"
+  /** Објавената редовна цена е повисока од најниската во 30-те дена пред акцијата. */
+  | "regular-raised"
+  /** Помалку од 30 дена податоци пред акцијата. */
+  | "insufficient"
+  | "not-on-promo";
+
+export interface PromoCheck {
+  verdict: PromoVerdict;
+  /** Првиот ден со сегашната акциска цена (во последниот непрекинат период). */
+  promoStart: string | null;
+  /** Најниската цена во 30-те дена пред почетокот; null ако нема податоци. */
+  lowestBefore: number | null;
+  /** Акцијата важи само со клуб-картичка. */
+  loyalty: boolean;
+}
+
+export function addDays(date: string, days: number): string {
+  const d = new Date(`${date}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + days);
+  return d.toISOString().slice(0, 10);
+}
+
+/** Почетокот на последниот непрекинат период со дадената цена. */
+function runStart(series: PricePoint[], price: number): string | null {
+  let start: string | null = null;
+  for (let i = series.length - 1; i >= 0; i--) {
+    if (series[i].price !== price) break;
+    start = series[i].date;
+  }
+  return start;
+}
+
+/**
+ * Дали акцијата е вистинска. `historyStart` е првиот ден за кој продавницата има
+ * податоци: пред него не знаеме колку чинел производот.
+ */
+export function promoCheck(offer: Offer, series: PricePoint[], historyStart: string): PromoCheck {
+  const loyalty = comparisonPrice(offer).loyaltyPrice !== null;
+  const onPromo = (offer.regularPrice !== null && offer.price < offer.regularPrice) || offer.promoKind != null;
+  if (!onPromo) return { verdict: "not-on-promo", promoStart: null, lowestBefore: null, loyalty };
+
+  const promoStart = runStart(series, offer.price);
+  // Истата цена уште од почетокот на историјата (не била „додадена" подоцна): акцијата
+  // почнала некогаш пред тоа. Ако тоа е барем 30 дена, цената не е пониска од 30-те дена пред.
+  if (promoStart === series[0]?.date && !series[0].added) {
+    const lastDate = series[series.length - 1].date;
+    const longEnough = historyStart <= addDays(lastDate, -PROMO_LOOKBACK_DAYS);
+    return { verdict: longEnough ? "not-lower" : "insufficient", promoStart: historyStart, lowestBefore: longEnough ? offer.price : null, loyalty };
+  }
+  const windowStart = promoStart && addDays(promoStart, -PROMO_LOOKBACK_DAYS);
+  if (!promoStart || !windowStart || windowStart < historyStart) {
+    return { verdict: "insufficient", promoStart, lowestBefore: null, loyalty };
+  }
+
+  let lowestBefore: number | null = null;
+  for (let day = windowStart; day < promoStart; day = addDays(day, 1)) {
+    const price = priceOn(series, day);
+    if (price !== null && (lowestBefore === null || price < lowestBefore)) lowestBefore = price;
+  }
+
+  const verdict: PromoVerdict =
+    lowestBefore === null
+      ? "insufficient"
+      : offer.price >= lowestBefore
+        ? "not-lower"
+        : offer.regularPrice !== null && offer.regularPrice > lowestBefore
+          ? "regular-raised"
+          : "genuine";
+  return { verdict, promoStart, lowestBefore, loyalty };
+}
