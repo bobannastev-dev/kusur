@@ -11,8 +11,13 @@ function offer(name: string, price: number, extra: Partial<Offer> = {}): Offer {
   return { name, price, regularPrice: null, unitPriceText: "", category: "", description: "", promoKind: null, promoUntil: null, ...extra };
 }
 
-function record(date: string, prevDate: string | null, diff: Partial<Pick<ChangesRecord, "added" | "removed" | "changed">>): ChangesRecord {
-  return { storeId: "s", date, prevDate, added: [], removed: [], changed: [], notes: [], ...diff };
+function record(
+  date: string,
+  prevDate: string | null,
+  diff: Partial<Pick<ChangesRecord, "added" | "removed" | "changed" | "addedMayReturn">>,
+): ChangesRecord {
+  // Како recordFetch: „новите" се сигурни само ако има (целосна) претходна снимка.
+  return { storeId: "s", date, prevDate, added: [], removed: [], changed: [], notes: [], addedMayReturn: prevDate === null, ...diff };
 }
 
 const change = (name: string, oldPrice: number, newPrice: number): PriceChange => ({ name, oldPrice, newPrice, offer: offer(name, newPrice) });
@@ -21,7 +26,7 @@ const X = "МЛЕКО 1Л";
 
 test("серија: додаден → променет → исчезнат → повторно додаден со друга цена", () => {
   const changes = [
-    record("2026-01-01", null, { added: [offer(X, 100)] }),
+    record("2026-01-01", "2025-12-31", { added: [offer(X, 100)] }),
     record("2026-01-05", "2026-01-04", { changed: [change(X, 100, 90)] }),
     record("2026-01-08", "2026-01-07", { removed: [offer(X, 90)] }),
     record("2026-01-12", "2026-01-11", { added: [offer(X, 95)] }),
@@ -36,6 +41,33 @@ test("серија: додаден → променет → исчезнат →
   assert.equal(priceOn(series, "2026-01-20"), 95);
   // Пред да биде додаден, го немало.
   assert.equal(priceOn(series, "2025-12-31"), null);
+});
+
+test("серија: производ што Жито го испуштил во нецелосна снимка не е нов кога ќе се врати", () => {
+  // 01: X постои (без промена); 03: нецелосна снимка, X не стигнал (не е запишан како исчезнат);
+  // 04: X се враќа како „нов", но претходната снимка беше нецелосна.
+  const changes = [
+    record("2026-01-03", "2026-01-02", { addedMayReturn: false }),
+    record("2026-01-04", "2026-01-03", { added: [offer(X, 50)], addedMayReturn: true }),
+  ];
+  const series = priceSeries(changes, { date: "2026-01-10", offer: offer(X, 50) }, X);
+  assert.equal(priceOn(series, "2026-01-01"), 50);
+});
+
+test("серија: прв ден на продавница — пред него не значи дека го немало", () => {
+  const changes = [record("2026-01-01", null, { added: [offer(X, 80)] })];
+  const series = priceSeries(changes, { date: "2026-01-10", offer: offer(X, 80) }, X);
+  assert.equal(series[0].added, false);
+  // Стари записи без ознака: првиот ден исто така не значи „нов".
+  const { addedMayReturn: _, ...old } = changes[0];
+  assert.equal(priceSeries([old], { date: "2026-01-10", offer: offer(X, 80) }, X)[0].added, false);
+});
+
+test("серија: цена за споредба без клуб-картичка, и за старата цена", () => {
+  const club = offer(X, 45, { regularPrice: 55, promoKind: "ЛОЈАЛНОСТ" });
+  const c = { ...change(X, 45, 50), oldOffer: club };
+  const series = priceSeries([record("2026-01-05", "2026-01-04", { changed: [c] })], { date: "2026-01-05", offer: offer(X, 50) }, X);
+  assert.deepEqual([priceOn(series, "2026-01-04"), priceOn(series, "2026-01-04", "comparable")], [45, 55]);
 });
 
 test("серија: производ без промени ја има тековната цена секој ден", () => {
@@ -153,11 +185,20 @@ test("акција: клуб-цената носи ознака; произво�
 });
 
 test("акција: иста акциска цена уште од почетокот на историјата", () => {
-  // Производот без промени: една точка (денешната снимка) — акцијата трае од пред историјата.
-  const today = "2026-02-10";
+  // Првиот ден на продавницата производот е „додаден" (без претходна снимка), потоа без промени.
   const offerOnPromo = milk("М", 80, { regularPrice: 100 });
-  const longHistory = promoCheck(offerOnPromo, [{ date: today, price: 80 }], START);
+  const seriesFrom = (first: string) =>
+    priceSeries([record(first, null, { added: [offerOnPromo] })], { date: "2026-02-10", offer: offerOnPromo }, "М");
+  const longHistory = promoCheck(offerOnPromo, seriesFrom(START), START);
   assert.deepEqual([longHistory.verdict, longHistory.promoStart, longHistory.lowestBefore], ["not-lower", START, 80]);
-  const shortHistory = promoCheck(offerOnPromo, [{ date: today, price: 80 }], "2026-02-01");
-  assert.equal(shortHistory.verdict, "insufficient");
+  assert.equal(promoCheck(offerOnPromo, seriesFrom("2026-02-01"), "2026-02-01").verdict, "insufficient");
+});
+
+test("акција: граници на 30-те дена — ден −30 се брои, ден −31 не", () => {
+  const promo = milk("М", 80, { regularPrice: 100 });
+  // Акција од ден 40; пониска цена (70) само на ден 10 (= −30) или ден 9 (= −31).
+  const at30 = promoCheck(promo, days([0, 100], [10, 70], [11, 100], [40, 80]), START);
+  assert.deepEqual([at30.verdict, at30.lowestBefore], ["not-lower", 70]);
+  const at31 = promoCheck(promo, days([0, 100], [9, 70], [10, 100], [40, 80]), START);
+  assert.deepEqual([at31.verdict, at31.lowestBefore], ["genuine", 100]);
 });

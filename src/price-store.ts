@@ -18,6 +18,11 @@ export interface ChangesRecord {
   changed: PriceChange[];
   /** Зошто нешто не е запишано (на пр. нецелосна снимка). */
   notes: string[];
+  /**
+   * „Нови" можеби не се нови, туку се враќаат: нема претходна снимка, или таа беше
+   * нецелосна или не кажува дали е целосна. Записите пред 2026-10-03 го немаат полето.
+   */
+  addedMayReturn?: boolean;
 }
 
 export interface PriceStore {
@@ -101,7 +106,9 @@ export async function recordFetch(store: PriceStore, date: string, snapshot: Sna
     notes.push(`нецелосна снимка (${of}): ${removed.length} „исчезнати" не се запишани`);
     removed = [];
   }
-  if (prev && missingCount(prev.snapshot) !== null && diff.added.length > 0) {
+  const addedMayReturn =
+    !prev || missingCount(prev.snapshot) !== null || (snapshot.completeness !== undefined && prev.snapshot.completeness === undefined);
+  if (prev && addedMayReturn && diff.added.length > 0) {
     notes.push(`претходната снимка беше нецелосна: дел од ${diff.added.length} „нови" можеби не се нови`);
   }
   if (diff.duplicates.length > 0) notes.push(`дупли имиња: ${diff.duplicates.length}`);
@@ -114,6 +121,7 @@ export async function recordFetch(store: PriceStore, date: string, snapshot: Sna
     removed,
     changed: diff.changed,
     notes,
+    addedMayReturn,
   };
   await store.saveSnapshot(date, snapshot);
   await store.saveChanges(record);

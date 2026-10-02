@@ -69,6 +69,24 @@ export function priceStoreContract(name: string, makeStore: () => Promise<PriceS
     assert.match(r.notes.join(" "), /нецелосна/);
   });
 
+  test(`${name}: „нови" по нецелосна или непозната претходна снимка можеби се враќаат`, async () => {
+    const store = await makeStore();
+    const all = Array.from({ length: 20 }, (_, i) => offer(`P${i}`, 10));
+    // Прв ден: нема претходна снимка.
+    const first = await recordFetch(store, "2026-10-01", snap("z", all.slice(1), { expected: 20, passes: 3 }));
+    assert.equal(first.addedMayReturn, true);
+    // Претходната беше нецелосна (19 од 20): P0 што се појавува можеби само се враќа.
+    const back = await recordFetch(store, "2026-10-02", snap("z", all, { expected: 20, passes: 3 }));
+    assert.deepEqual([back.added.map((o) => o.name), back.addedMayReturn], [["P0"], true]);
+    // Претходната беше целосна: нов е навистина нов.
+    const fresh = await recordFetch(store, "2026-10-03", snap("z", [...all, offer("НОВ", 5)], { expected: 21, passes: 3 }));
+    assert.equal(fresh.addedMayReturn, false);
+    // Претходната не кажува колку објавува изворот (стара снимка), а оваа кажува: не се знае.
+    await store.saveSnapshot("2026-10-04", snap("y", all));
+    const unknown = await recordFetch(store, "2026-10-05", snap("y", [...all, offer("Н", 1)], { expected: 21, passes: 3 }));
+    assert.equal(unknown.addedMayReturn, true);
+  });
+
   test(`${name}: непознат број на производи значи нецелосна снимка`, async () => {
     const store = await makeStore();
     await recordFetch(store, "2026-10-01", snap("z", [offer("A", 1), offer("B", 2)], { expected: 0, passes: 3 }));

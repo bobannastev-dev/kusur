@@ -9,6 +9,8 @@ export interface PriceChange {
   newPrice: number;
   /** Новиот ред од ценовникот (редовна цена, акција, единечна цена). */
   offer: Offer;
+  /** Стариот ред (за цената без клуб-картичка); записите пред 2026-10-03 го немаат. */
+  oldOffer?: Offer;
 }
 
 export interface OfferDiff {
@@ -39,7 +41,7 @@ export function diffOffers(prev: Offer[] | null, next: Offer[]): OfferDiff {
   for (const [name, offer] of after) {
     const old = before.get(name);
     if (!old) added.push(offer);
-    else if (old.price !== offer.price) changed.push({ name, oldPrice: old.price, newPrice: offer.price, offer });
+    else if (old.price !== offer.price) changed.push({ name, oldPrice: old.price, newPrice: offer.price, offer, oldOffer: old });
   }
   const removed = [...before.values()].filter((o) => !after.has(o.name));
 

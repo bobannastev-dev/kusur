@@ -10,8 +10,11 @@ import type { Offer, SnapshotFile } from "./types.ts";
 /** Набљудување: цената тој ден, или null ако производот го немало. */
 export interface PricePoint {
   date: string;
+  /** Објавената продажна цена. */
   price: number | null;
-  /** Набљудувањето е „додаден": пред него производот го немало. */
+  /** Цената за споредба, без клуб-картичка (`comparisonPrice`); иста како `price` кога не се знае. */
+  comparable?: number | null;
+  /** Производот е навистина нов на тој ден: пред него го немало. */
   added?: boolean;
 }
 
@@ -24,6 +27,19 @@ const WEIGHT = {
   /** Тековната снимка. */
   current: 2,
 } as const;
+
+/** Набљудување на ред од ценовникот. */
+function seen(date: string, offer: Offer): PricePoint {
+  return { date, price: offer.price, comparable: comparisonPrice(offer).price };
+}
+
+/**
+ * „Новите" во записот можеби само се враќаат (нецелосна претходна снимка, прв ден).
+ * Записите пред 2026-10-03 немаат ознака: тогаш од првиот ден и белешката.
+ */
+function addedMayReturn(r: ChangesRecord): boolean {
+  return r.addedMayReturn ?? (r.prevDate === null || r.notes.some((n) => n.startsWith("претходната снимка")));
+}
 
 /**
  * Серии на цени за сите производи на една продавница, со едно поминување низ промените.
@@ -39,17 +55,21 @@ export function allSeries(changes: ChangesRecord[], current: { date: string; off
   };
 
   for (const r of [...changes].sort((a, b) => a.date.localeCompare(b.date))) {
-    for (const o of r.added) put(o.name, { date: r.date, price: o.price, added: true }, WEIGHT.sameDay);
+    const added = !addedMayReturn(r);
+    for (const o of r.added) put(o.name, { ...seen(r.date, o), added }, WEIGHT.sameDay);
     for (const c of r.changed) {
-      if (r.prevDate) put(c.name, { date: r.prevDate, price: c.oldPrice }, WEIGHT.previous);
-      put(c.name, { date: r.date, price: c.newPrice }, WEIGHT.sameDay);
+      if (r.prevDate) {
+        const comparable = c.oldOffer ? comparisonPrice(c.oldOffer).price : c.oldPrice;
+        put(c.name, { date: r.prevDate, price: c.oldPrice, comparable }, WEIGHT.previous);
+      }
+      put(c.name, seen(r.date, c.offer), WEIGHT.sameDay);
     }
     for (const o of r.removed) {
-      if (r.prevDate) put(o.name, { date: r.prevDate, price: o.price }, WEIGHT.previous);
-      put(o.name, { date: r.date, price: null }, WEIGHT.sameDay);
+      if (r.prevDate) put(o.name, seen(r.prevDate, o), WEIGHT.previous);
+      put(o.name, { date: r.date, price: null, comparable: null }, WEIGHT.sameDay);
     }
   }
-  for (const o of current.offers) put(o.name, { date: current.date, price: o.price }, WEIGHT.current);
+  for (const o of current.offers) put(o.name, seen(current.date, o), WEIGHT.current);
 
   return new Map(
     [...byName].map(([name, points]) => [name, [...points.values()].map((p) => p.point).sort((a, b) => a.date.localeCompare(b.date))]),
@@ -65,15 +85,16 @@ export function priceSeries(changes: ChangesRecord[], current: { date: string; o
  * Цената на датумот: последното набљудување до тој ден; пред првото набљудување —
  * истата цена, освен ако првото е „додаден" (тогаш производот го немало).
  */
-export function priceOn(series: PricePoint[], date: string): number | null {
+export function priceOn(series: PricePoint[], date: string, kind: "price" | "comparable" = "price"): number | null {
+  const value = (p: PricePoint) => (kind === "comparable" ? (p.comparable !== undefined ? p.comparable : p.price) : p.price);
   let last: PricePoint | undefined;
   for (const p of series) {
     if (p.date > date) break;
     last = p;
   }
-  if (last) return last.price;
+  if (last) return value(last);
   const first = series[0];
-  return !first || first.added ? null : first.price;
+  return !first || first.added ? null : value(first);
 }
 
 // ── Поевтинето од датум ──
@@ -156,7 +177,7 @@ export function dropsSince(stores: StoreHistory[], types: ProductType[], since: 
 
     for (const { h, series, current, known } of prepared) {
       for (const c of findCandidates(known, type, maps)) {
-        const oldPrice = priceOn(series.get(c.offer.name) ?? [], effective);
+        const oldPrice = priceOn(series.get(c.offer.name) ?? [], effective, "comparable");
         if (oldPrice !== null) then = cheaper(then, { store: h.snapshot, offer: c.offer, unitPrice: unitOf(c, oldPrice) });
         if (!current.has(c.offer.name)) continue;
 
