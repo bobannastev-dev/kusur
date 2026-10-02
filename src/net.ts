@@ -1,7 +1,9 @@
 // Културно преземање: искрен User-Agent, тајмаут, повторни обиди и пауза меѓу барања.
 
-// HTTP заглавјата мора да се ASCII, затоа текстот е на латиница.
-const USER_AGENT = "poevtino-bot/0.1 (sporedba na ceni; kontakt: )";
+// HTTP заглавјата мора да се ASCII, затоа текстот е на латиница. Искрено име и
+// намена; без лична е-пошта (одлука 2026-10-02). Кога ќе има јавна страница на
+// проектот, нејзината адреса оди тука како контакт.
+const USER_AGENT = "poevtino-bot/0.1 (sporedba na ceni vo marketi)";
 const TIMEOUT_MS = 90_000;
 const MAX_RETRIES = 3;
 const RETRY_BACKOFF_MS = 3_000;
