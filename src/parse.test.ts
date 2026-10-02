@@ -35,6 +35,13 @@ test("parseQuantity: тежина и волумен", () => {
   assert.equal(parseQuantity("ЗДРАВЈЕ РАДОВО КРАВЈО СИРЕЊЕ ВАКУМ КГ", ["kg"]), null);
 });
 
+test("parseQuantity: количина слеплена со зборот до неа", () => {
+  assert.deepEqual(parseQuantity("ПИЛЕШКИ КРИЛЦА АНА КОМ 500грЛУТИ ЗАЧИН.", ["kg"]), { unit: "kg", amount: 0.5 });
+  assert.deepEqual(parseQuantity("ЧОКОЛАДА ПИОНИР КАКАО КРАНЧИ 100грМЛЕЧНА", ["kg"]), { unit: "kg", amount: 0.1 });
+  // Еднобуквени единици („г", „л") само како посебен збор: „+3ГОД" не е 3 грама.
+  assert.equal(parseQuantity("КАШИЧКА ЗА ДЕЦА +3ГОД", ["kg"]), null);
+});
+
 test("parseQuantity: парчиња", () => {
   assert.deepEqual(parseQuantity("ЈАЈЦА ШЕСТ БРАЌА Л 10/1", ["pc"]), { unit: "pc", amount: 10 });
   assert.deepEqual(parseQuantity("ВЕЗЕШАРИ ЈАЈЦА М 1/18", ["pc"]), { unit: "pc", amount: 18 });

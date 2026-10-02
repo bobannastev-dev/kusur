@@ -65,3 +65,34 @@ test("мапа на производи: типовите постојат, си�
   assert.deepEqual(unknown, []);
   assert.deepEqual(Object.keys(PRODUCT_MAP).filter((chain) => Object.hasOwn(CATEGORY_MAP, chain)), []);
 });
+
+// Погрешни избори најдени во систематскиот преглед (2026-10-02): производ од мешана
+// категорија што не е типот. Секој случај: категоријата е мапирана на типот, а правилата
+// мора да го одбијат производот (и да прифатат вистински од истиот тип).
+test("правила: погрешни избори од прегледот се одбиени", async () => {
+  const { matchesType } = await import("./match.ts");
+  const cases: [typeId: string, category: string, wrong: string, right: string][] = [
+    ["sladoled", "Сладолед во кутија", "МРАЗ ИНТЕР ФРОСТ 1кг", "СЛАДОЛЕД ВАНИЛА 1Л"],
+    ["vino", "Вино", "ОВОШЕН ПУНЧ СО ВКУС НА ЈАГОДА 750 МЛ 6.5", "ВИНО КУВЕ 750мл БЕЛО"],
+    ["krem-sirenje", "Намази", "НАМАЗ РАСТИТЕЛЕН ХУМУС НАТУР/СЕМКИ 240ГР", "КРЕМ НАМАЗ ХАЈДУ 100гр"],
+    ["napolitanki", "Вафли", "ШТРУДЛА МЕШАНО ОВОШЈЕ 250 Г ВАФЛИНИ", "НАПОЛИТАНКА 5КА 350гр КАКАО"],
+    ["vrekji", "Кеси", "КЕСЕ ЗАМРЗНУВАЧ 2лит 1/33 8мик 1422", "КЕСИ ЃУБРЕ ФИНО 20л 30/1"],
+    ["sampon", "Нега на коса", "РЕГ.ЗА КОСА СО АРНИКА И З.ЧАЈ 400МЛ", "ШАМПОН БРЕЗА 930мл. ХЕРБА"],
+    ["vloski", "Хигиена", "САМОЛЕПЛИВИ ВЛОШКИ ЗА ПОД ПАЗУВИ М 2КОМ", "ВЛОШКИ СУПЕР СО КРИЛЦА 16/1 АЛУР"],
+    ["luk", "Зеленчук", "ЛУК МАКЕДОНСКИ ГЛАВИЦА", "ЛУК СТАР А"],
+    // Млад лук се продава по врска, не по кило.
+    ["luk", "Зеленчук", "ЛУК МЛАД 3/1", "ЛУК УВОЗЕН 1КГ"],
+    ["vino", "Вино", "ПЕНЛИВ КОКТЕЛ БЕЛИНИ 750 МЛ 6%АЛК", "ВИНО ЦРВЕНИ БРЕГОВИ 1Л"],
+    // „10кг" е грешка во името кај маркетот (единечната цена вели 1 кг); и инаку не е домашна количина.
+    ["sol", "Сол", "СОЛ ЕВРО 10кг МОРСКА", "СОЛ ЕВРО 1кг СИТНА"],
+  ];
+  const problems: string[] = [];
+  for (const [typeId, category, wrong, right] of cases) {
+    const type = TYPES_BY_ID.get(typeId)!;
+    const maps = { products: {}, categories: { Т: { [category]: [typeId] } } };
+    const offer = (name: string) => ({ name, price: 1, regularPrice: null, unitPriceText: "", category, description: "", promoKind: null, promoUntil: null });
+    if (matchesType(offer(wrong), "Т", type, maps)) problems.push(`${typeId}: прифатен „${wrong}"`);
+    if (!matchesType(offer(right), "Т", type, maps)) problems.push(`${typeId}: одбиен „${right}"`);
+  }
+  assert.deepEqual(problems, []);
+});

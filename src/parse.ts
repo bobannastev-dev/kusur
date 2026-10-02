@@ -60,7 +60,11 @@ export function parseUnitPrice(text: string): { unit: Unit; price: number } | nu
   return { unit: base.unit, price: tidy(price / (amount * base.factor)) };
 }
 
-const MEASURE = String.raw`(кгр|кг|kg|гр|г|g|мл|ml|лит|л|l)(?!\p{L})`;
+// „гр", „кг" се читаат и кога маркетот ги слепил со следниот збор, но само залепени и за
+// бројот („500грЛУТИ"; не „РВ6 ГРИМИЗНА");
+// еднобуквените „г", „л" и „мл" (почеток на „МЛЕКО") само како посебен збор: „+3ГОД" не е 3 г;
+// „гр" не е почеток на „ГРАТИС" („5+1ГРАТИС").
+const MEASURE = String.raw`((?<=\d)(?:кгр|кг|kg|гр(?!ат))(?=\p{L})|(?:кгр|кг|kg|гр|г|g|мл|ml|лит|л|l)(?!\p{L}))`;
 const MULTI_PACK_RE = new RegExp(String.raw`(\d+)\s*[xх×*]\s*(\d+(?:[.,]\d+)?)\s*${MEASURE}`, "u");
 const SINGLE_RE = new RegExp(String.raw`(\d+(?:[.,]\d+)?)\s*${MEASURE}`, "u");
 const PIECES_RE = /(\d+)\s*ком/u;
