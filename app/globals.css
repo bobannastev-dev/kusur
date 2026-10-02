@@ -1,0 +1,130 @@
+/* Изгледот од одобрената макета: топол преливник, стаклени картички, лебдечко мени.
+   Светла и темна тема по телефонот. Боите се само тука, како променливи. */
+
+:root {
+  --ink: #2a1a12;
+  --ink-soft: #6b4a38;
+  --muted: #7d5d4b;
+  --glass: rgba(255, 255, 255, 0.58);
+  --glass-strong: rgba(255, 255, 255, 0.82);
+  --line: rgba(255, 255, 255, 0.7);
+  --accent: #c2410c;
+  --accent-ink: #ffffff;
+  --good: #166534;
+  --good-bg: rgba(22, 101, 52, 0.12);
+  --bar: #e7b98f;
+  --bar-best: #c2410c;
+  --nav: rgba(255, 250, 244, 0.72);
+  --pill: #2a1a12;
+  --pill-ink: #fff7ed;
+  --base: #f6e6cf;
+  --glow-1: #ffd9a8;
+  --glow-2: #f3a76b;
+  --glow-3: #c9b1c4;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #fff4ea;
+    --ink-soft: #e8cdb8;
+    --muted: #c9a991;
+    --glass: rgba(255, 255, 255, 0.09);
+    --glass-strong: rgba(255, 255, 255, 0.15);
+    --line: rgba(255, 255, 255, 0.14);
+    --accent: #fb923c;
+    --accent-ink: #2a1206;
+    --good: #86efac;
+    --good-bg: rgba(134, 239, 172, 0.14);
+    --bar: rgba(255, 255, 255, 0.22);
+    --bar-best: #fb923c;
+    --nav: rgba(40, 26, 22, 0.72);
+    --pill: #fff4ea;
+    --pill-ink: #2a1206;
+    --base: #1c1411;
+    --glow-1: #7c2d12;
+    --glow-2: #9a3412;
+    --glow-3: #4c3a52;
+    color-scheme: dark;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: var(--font-text), system-ui, sans-serif;
+  color: var(--ink);
+  background-color: var(--base);
+  background-image:
+    radial-gradient(120% 70% at 10% 0%, var(--glow-1) 0%, transparent 60%),
+    radial-gradient(90% 60% at 100% 30%, var(--glow-2) 0%, transparent 65%),
+    radial-gradient(100% 70% at 30% 100%, var(--glow-3) 0%, transparent 60%);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--accent);
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.page {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 22px 20px 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.glass {
+  background: var(--glass);
+  border: 1px solid var(--line);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.title {
+  margin: 0;
+  font: 600 26px/1.2 var(--font-display), sans-serif;
+}
+
+.lead {
+  margin: 6px 0 0;
+  font-size: 15px;
+  color: var(--ink-soft);
+}
+
+.eyebrow {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

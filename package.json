@@ -12,19 +12,26 @@
     "basket": "node src/cli.ts",
     "test": "node --test \"src/**/*.test.ts\"",
     "categories": "node src/categories.ts",
-    "typecheck": "tsc -p .",
+    "typecheck": "tsc -p . && tsc -p tsconfig.app.json",
     "stores": "node src/stores-cli.ts",
     "propose": "node src/propose-cli.ts",
     "drops": "node src/drops-cli.ts",
     "history": "node src/history-cli.ts",
-    "build-data": "node src/publish/build-data.ts"
+    "build-data": "node src/publish/build-data.ts",
+    "dev": "next dev",
+    "build": "npm run build-data && next build"
   },
   "dependencies": {
     "cheerio": "^1.0.0",
-    "pdfjs-dist": "^6.3.289"
+    "next": "^16.3.8",
+    "pdfjs-dist": "^6.3.289",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
   },
   "devDependencies": {
     "@types/node": "^22.20.4",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
     "typescript": "^7.0.2"
   }
 }

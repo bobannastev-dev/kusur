@@ -40,13 +40,14 @@
 
 ## Фаза 2: Апликацијата
 
-- [ ] **Задача 3: Next.js основа**
+- [x] **Задача 3: Next.js основа**
   - Опис: `next`, `react`, `react-dom`; `next.config` (static export); `app/layout.tsx` (Onest, Unbounded, тема по телефонот, CSS променливите од макетата); мени долу (4 екрани, активно, `aria-current`); вчитување на `/data/*.json`; `app/lib/storage.ts`.
   - Прифаќање: `npm run dev` ги покажува 4-те празни екрани со менито во светла и темна тема; увозите од `src/` работат во прелистувач; `npm run build` прави `out/`.
   - Проверка: `npm run dev` (рачно), `npm run build`, `npm run typecheck`
   - Зависи од: 2
   - Фајлови: `package.json`, `next.config.ts`, `tsconfig.json`, `app/layout.tsx`, `app/globals.css`, `app/components/BottomNav.tsx`, `app/lib/data.ts`, `app/lib/storage.ts`
   - Обем: M
+  - Направено: Next 16.3.8, React 19.3 (+ `@types/react`, `@types/react-dom` само за типови). Посебна `tsconfig.app.json` (Next ја менува неа, `tsconfig.json` за командите останува); `next build` не ги проверува типовите — тоа е `npm run typecheck` (TypeScript 7) за двата дела. Увозите од `src/*.ts` работат без резервниот слој. `next build` → `out/` (4 статички страници + `data/`); целиот JS ~176 KB gzip. Рути: `/`, `/poevtineto/`, `/prebaraj/`, `/prodavnici/`.
 
 - [ ] **Задача 4: Кошничка**
   - Опис: меури (тип + количина), панел за количина/тргни, „+" со пребарување на типовите и залепен список; голема бројка, заштеда, „со 2 продавници", ленти; детали по продавница; чување во `localStorage`; примерен список.

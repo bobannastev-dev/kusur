@@ -6,3 +6,5 @@ data/changes/
 !.env.example
 data/review/
 public/data/
+.next/
+out/
