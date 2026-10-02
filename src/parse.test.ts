@@ -41,6 +41,17 @@ test("parseQuantity: парчиња", () => {
   assert.deepEqual(parseQuantity("ЈАЈЦА ШЕСТ БРАЌА 30/Л", ["pc"]), { unit: "pc", amount: 30 });
   assert.deepEqual(parseQuantity("ЈАЈЦА КЛАСА М табла 30ком. НАШЕ ЈАЈЦЕ", ["pc"]), { unit: "pc", amount: 30 });
   assert.deepEqual(parseQuantity("ТОАЛЕТ ХАРТИЈА ПРЕМИУМ 3слоја 8+2 СОФТЛИ", ["pc"]), { unit: "pc", amount: 10 });
+  // „16рол … 3/1" = 3 пакувања по 16 ролни.
+  assert.deepEqual(parseQuantity("ТОАЛЕТ ПЕРФЕКС СОФТ ЛАЈТ 16рол 3сл 3/1", ["pc"]), { unit: "pc", amount: 48 });
+  // „8+2" со „/1" од која било страна е пак 10 ролни.
+  assert.deepEqual(parseQuantity("ТОАЛЕТ ПЕРФЕКС 8+2/1М 3СЛОЈНА", ["pc"]), { unit: "pc", amount: 10 });
+  assert.deepEqual(parseQuantity("ТОАЛЕТ ПЕРФЕКС 8/1+2 БЕЛА КАМИЛИЦА", ["pc"]), { unit: "pc", amount: 10 });
+  assert.deepEqual(parseQuantity("ЕВРИ ДЕЈ ВЛОШКИ СЕКОЈДН. 40+20/1", ["pc"]), { unit: "pc", amount: 60 });
+  // „15+" е тежина на детето, „+3ГОД" возраст — не се додаваат.
+  assert.deepEqual(parseQuantity("ДЕТСКИ ПЕЛЕНИ БР.6 15+ 40/1 БИОБИА", ["pc"]), { unit: "pc", amount: 40 });
+  assert.deepEqual(parseQuantity("ЧЕТКА ЗА ЗАБИ ДЕТСКА ДЕНТАМЕД 2/1 +3ГОД", ["pc"]), { unit: "pc", amount: 2 });
+  // „РОЛЕТИ" е марка, не број на ролни.
+  assert.deepEqual(parseQuantity("ТОАЛЕТ ХАРТ.3СЛ 100% ЦЕЛ.16/1 РОЛЕТИ", ["pc"]), { unit: "pc", amount: 16 });
 });
 
 test("parseQuantity: пакувања од типот 5+1", () => {

@@ -65,6 +65,11 @@ const MULTI_PACK_RE = new RegExp(String.raw`(\d+)\s*[xх×*]\s*(\d+(?:[.,]\d+)?)
 const SINGLE_RE = new RegExp(String.raw`(\d+(?:[.,]\d+)?)\s*${MEASURE}`, "u");
 const PIECES_RE = /(\d+)\s*ком/u;
 const PACK_RATIO_RE = /(\d+)\s*\/\s*(\d+)/u;
+// „16рол … 3/1" = 3 пакувања по 16 ролни („РОЛЕТИ" е марка, не број).
+const ROLLS_RE = /(\d+)\s*рол(?:ни)?(?!\p{L})/u;
+// „8+2/1" и „8/1+2" = 10 парчиња; „/1" не е дел од збирот. Само без празни места:
+// „ПЕЛЕНИ БР.6 15+ 40/1" е 40 пелени за 15+ кг, „2/1 +3ГОД" е 2 четки за 3+ години.
+const PLUS_PER_ONE_RE = /(?<![\d.,])(\d{1,2})(?:\+(\d{1,2})\/1|\/1\+(\d{1,2}))(?!\d)/u;
 // „30/Л" = 30 јајца од класа Л.
 const PACK_CLASS_RE = /(\d+)\s*\/\s*(?:хл|xl|л|м|с|l|m|s)(?!\p{L})/u;
 // „5+1", „8+2", „3+1х90гр" = толку парчиња во пакувањето (не „300мл+300мл").
@@ -106,7 +111,15 @@ export function parseQuantity(name: string, units: Unit[]): { unit: Unit; amount
     const pieces = PIECES_RE.exec(n);
     if (pieces) return { unit: "pc", amount: Number(pieces[1]) };
 
+    const plusPerOne = PLUS_PER_ONE_RE.exec(n);
+    if (plusPerOne) return { unit: "pc", amount: Number(plusPerOne[1]) + Number(plusPerOne[2] ?? plusPerOne[3]) };
+
     const ratio = PACK_RATIO_RE.exec(n);
+    const rolls = ROLLS_RE.exec(n);
+    if (rolls) {
+      const packs = ratio && Number(ratio[2]) === 1 ? Number(ratio[1]) : 1;
+      return { unit: "pc", amount: packs * Number(rolls[1]) };
+    }
     if (ratio) {
       const [a, b] = [Number(ratio[1]), Number(ratio[2])];
       if (b === 1 && a > 0) return { unit: "pc", amount: a };
