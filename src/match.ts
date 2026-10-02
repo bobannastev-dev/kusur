@@ -20,10 +20,29 @@ export interface Candidate {
 }
 
 export interface Purchase extends Candidate {
+  /** Цена на едно пакување (или по кг) за споредба — без клуб-картичка. */
+  price: number;
+  /** Цена со клуб-картичка, само за приказ; null ако нема клуб-цена. */
+  loyaltyPrice: number | null;
   packs: number;
   /** Количина што реално се добива. */
   amount: number;
   cost: number;
+}
+
+/** Видови акција што важат само со картичка на синџирот (засега Рамстор). */
+const LOYALTY_PROMO_KINDS = new Set(["ЛОЈАЛНОСТ"]);
+
+/**
+ * Со која цена се споредува редот. Клуб-цената не ја добива секој купувач,
+ * па се споредува редовната, а клуб-цената се носи за приказ.
+ */
+export function comparisonPrice(offer: Offer): { price: number; loyaltyPrice: number | null } {
+  const loyalty = offer.promoKind != null && LOYALTY_PROMO_KINDS.has(offer.promoKind.toUpperCase());
+  if (loyalty && offer.regularPrice !== null && offer.regularPrice > offer.price) {
+    return { price: offer.regularPrice, loyaltyPrice: offer.price };
+  }
+  return { price: offer.price, loyaltyPrice: null };
 }
 
 function unitsOf(type: ProductType) {
@@ -74,11 +93,12 @@ export function findCandidates(store: SnapshotFile, type: ProductType, map: Cate
 }
 
 function purchase(candidate: Candidate, need: number): Purchase {
+  const { price, loyaltyPrice } = comparisonPrice(candidate.offer);
   if (candidate.divisible) {
-    return { ...candidate, packs: 1, amount: need, cost: Math.round(candidate.offer.price * need) };
+    return { ...candidate, price, loyaltyPrice, packs: 1, amount: need, cost: Math.round(price * need) };
   }
   const packs = Math.max(1, Math.ceil((need * (1 - SIZE_TOLERANCE)) / candidate.packAmount - 1e-9));
-  return { ...candidate, packs, amount: packs * candidate.packAmount, cost: packs * candidate.offer.price };
+  return { ...candidate, price, loyaltyPrice, packs, amount: packs * candidate.packAmount, cost: packs * price };
 }
 
 /** Најевтиниот начин да се купи `need` од дадениот тип во една продавница. */

@@ -41,11 +41,15 @@ function printPlan(plan: Plan, showStore: boolean) {
       continue;
     }
     const where = showStore ? ` @ ${store.label}` : "";
-    const packs = purchase.divisible ? "на мерење" : `${purchase.packs} × ${den(purchase.offer.price)}`;
+    const packs = purchase.divisible ? `на мерење, ${den(purchase.price)}/кг` : `${purchase.packs} × ${den(purchase.price)}`;
+    const perKg = purchase.divisible ? "/кг" : "";
+    const { regularPrice } = purchase.offer;
     const promo =
-      purchase.offer.regularPrice && purchase.offer.price < purchase.offer.regularPrice
-        ? ` (акција, редовно ${den(purchase.offer.regularPrice)})`
-        : "";
+      purchase.loyaltyPrice !== null
+        ? ` (со клуб-картичка ${den(purchase.loyaltyPrice)}${perKg})`
+        : regularPrice && purchase.price < regularPrice
+          ? ` (акција, редовно ${den(regularPrice)})`
+          : "";
     console.log(`    ${den(purchase.cost).padStart(10)}  ${label}${where}`);
     console.log(`                ${purchase.offer.name} · ${packs}${promo}`);
   }

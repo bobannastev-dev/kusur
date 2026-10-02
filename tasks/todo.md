@@ -19,7 +19,7 @@
   - Фајлови: `src/types.ts`, `src/sources/table.ts`, `src/sources/proverkanaceni.ts`, `src/sources/ramstore.ts`, `src/sources/kam.ts` (+ постоечките тестови)
   - Обем: M
 
-- [ ] **Задача 2: `comparisonPrice` и клуб-цена во споредбата**
+- [x] **Задача 2: `comparisonPrice` и клуб-цена во споредбата**
   - Опис: `comparisonPrice(offer)`: „ЛОЈАЛНОСТ" со редовна цена → редовната; инаку продажната. `cheapestPurchase` ја користи; `Purchase` го носи `loyaltyPrice`. `npm run basket` печати „(со клуб-картичка X)".
   - Прифаќање:
     - Тест: ЛОЈАЛНОСТ 45 / редовна 55 → цена 55, `loyaltyPrice` 45.
