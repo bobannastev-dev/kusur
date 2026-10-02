@@ -161,43 +161,65 @@ export function dropsSince(stores: StoreHistory[], types: ProductType[], since: 
   return dropsSinceWith(stores, types, since, (store, type) => findCandidates(store, type, maps));
 }
 
-/**
- * Исто како `dropsSince`, со кандидати од извор (телефонот: од пакетот). Изворот ја
- * добива снимката проширена со исчезнатите производи (последниот познат ред).
- */
+/** Една продавница подготвена за `dropsFrom`: од целосната историја или од пакетот за телефонот. */
+export interface PreparedStore {
+  snapshot: SnapshotFile;
+  /** Првиот ден со податоци (`historyStart`). */
+  start: string;
+  /** Серијата на цени на производ (празна ако не е познат). */
+  seriesOf: (name: string) => PricePoint[];
+  /** Дали производот е во денешниот ценовник (исчезнатите се бројат само во „тогаш"). */
+  isCurrent: (name: string) => boolean;
+  /** Кандидатите за типот: денешните и исчезнатите (последниот познат ред). */
+  candidates: (type: ProductType) => Candidate[];
+}
+
+/** Подготовка од целосната историја, со кандидати од извор (командите: `findCandidates`). */
+export function prepareStore(h: StoreHistory, candidatesFor: (known: SnapshotFile, type: ProductType) => Candidate[]): PreparedStore {
+  const series = allSeries(h.changes, { date: h.date, offers: h.snapshot.offers });
+  const current = new Set(h.snapshot.offers.map((o) => o.name));
+  // Исчезнатите производи (последниот познат ред) учествуваат само во „тогаш".
+  const gone = new Map<string, Offer>();
+  for (const r of h.changes) for (const o of r.removed) if (!current.has(o.name)) gone.set(o.name, o);
+  const known: SnapshotFile = { ...h.snapshot, offers: [...h.snapshot.offers, ...gone.values()] };
+  return {
+    snapshot: h.snapshot,
+    start: historyStart(h),
+    seriesOf: (name) => series.get(name) ?? [],
+    isCurrent: (name) => current.has(name),
+    candidates: (type) => candidatesFor(known, type),
+  };
+}
+
+/** Исто како `dropsSince`, со кандидати од извор. */
 export function dropsSinceWith(
   stores: StoreHistory[],
   types: ProductType[],
   since: string,
   candidatesFor: (known: SnapshotFile, type: ProductType) => Candidate[],
 ): TypeDrops[] {
-  const start = stores.map(historyStart).sort()[0] ?? since;
-  const effective = since < start ? start : since;
+  return dropsFrom(stores.map((h) => prepareStore(h, candidatesFor)), types, since);
+}
 
-  const prepared = stores.map((h) => {
-    const series = allSeries(h.changes, { date: h.date, offers: h.snapshot.offers });
-    const current = new Set(h.snapshot.offers.map((o) => o.name));
-    // Исчезнатите производи (последниот познат ред) учествуваат само во „тогаш".
-    const gone = new Map<string, Offer>();
-    for (const r of h.changes) for (const o of r.removed) if (!current.has(o.name)) gone.set(o.name, o);
-    const known: SnapshotFile = { ...h.snapshot, offers: [...h.snapshot.offers, ...gone.values()] };
-    return { h, series, current, known };
-  });
+/** Поевтинето по тип од подготвени продавници (видете `dropsSince`). */
+export function dropsFrom(stores: PreparedStore[], types: ProductType[], since: string): TypeDrops[] {
+  const start = stores.map((s) => s.start).sort()[0] ?? since;
+  const effective = since < start ? start : since;
 
   return types.map((type) => {
     const drops: Drop[] = [];
     let then: UnitBest | null = null;
     let now: UnitBest | null = null;
 
-    for (const { h, series, current, known } of prepared) {
-      for (const c of candidatesFor(known, type)) {
-        const oldPrice = priceOn(series.get(c.offer.name) ?? [], effective, "comparable");
-        if (oldPrice !== null) then = cheaper(then, { store: h.snapshot, offer: c.offer, unitPrice: unitOf(c, oldPrice) });
-        if (!current.has(c.offer.name)) continue;
+    for (const store of stores) {
+      for (const c of store.candidates(type)) {
+        const oldPrice = priceOn(store.seriesOf(c.offer.name), effective, "comparable");
+        if (oldPrice !== null) then = cheaper(then, { store: store.snapshot, offer: c.offer, unitPrice: unitOf(c, oldPrice) });
+        if (!store.isCurrent(c.offer.name)) continue;
 
         const newPrice = comparisonPrice(c.offer).price;
-        now = cheaper(now, { store: h.snapshot, offer: c.offer, unitPrice: unitOf(c, newPrice) });
-        if (oldPrice !== null && isDrop(oldPrice, newPrice)) drops.push({ store: h.snapshot, offer: c.offer, oldPrice, newPrice });
+        now = cheaper(now, { store: store.snapshot, offer: c.offer, unitPrice: unitOf(c, newPrice) });
+        if (oldPrice !== null && isDrop(oldPrice, newPrice)) drops.push({ store: store.snapshot, offer: c.offer, oldPrice, newPrice });
       }
     }
 

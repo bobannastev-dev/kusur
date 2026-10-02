@@ -5,3 +5,4 @@ data/changes/
 .env.*
 !.env.example
 data/review/
+public/data/

@@ -16,7 +16,8 @@
     "stores": "node src/stores-cli.ts",
     "propose": "node src/propose-cli.ts",
     "drops": "node src/drops-cli.ts",
-    "history": "node src/history-cli.ts"
+    "history": "node src/history-cli.ts",
+    "build-data": "node src/publish/build-data.ts"
   },
   "dependencies": {
     "cheerio": "^1.0.0",
