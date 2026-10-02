@@ -52,21 +52,22 @@
   - Обем: M
 
 ### Checkpoint A
-- [ ] `npm test`, `npm run typecheck` зелени
-- [ ] Критериуми 1–5 од spec-от со тестови
-- [ ] Преглед со човек
+- [x] `npm test`, `npm run typecheck` зелени
+- [x] Критериуми 1–5 од spec-от со тестови
+- [x] Преглед со човек
 
 ---
 
 ## Фаза 2: Команди
 
-- [ ] **Задача 5: `npm run drops` и `npm run history`**
+- [x] **Задача 5: `npm run drops` и `npm run history`**
   - Опис: `src/drops-cli.ts` (`--since`, список со `parseList`), `src/history-cli.ts` (продавница + име: серија, „вистинска акција"). Читање преку `PriceStore`.
   - Прифаќање: критериум 6 од spec-от на вистинските податоци (01–02.10).
   - Проверка: `npm run drops -- --since 2026-10-01 "млеко, кафе, јајца"`; `npm run history -- ramstore-veles "ВИТАМИНКА МЕКО КОЛАЧЕ ФРУТИ МАЛИНА 112Г"`
   - Зависи од: 2, 3
   - Фајлови: `src/drops-cli.ts`, `src/history-cli.ts`, `package.json`
   - Обем: M
+  - Резултат (01–02.10): `drops` за „млеко, кафе, јајца" за 2,4 сек — кафе „О‘ДОР 200гр" во двата Стокомак 129 → 105 (−19%); млеко и јајца без поевтинување (најевтино 44 ден/л, 4,3 ден/парче). `history` за ВИТАМИНКА: 38 → 32, акција „нема доволно историја". Заедничко: `loadHistories` (price-store.ts), `PROMO_VERDICT_TEXT` (history.ts).
 
 ### Checkpoint B (модулот готов)
 - [ ] Сите 7 критериуми од `SPEC-price-history.md`

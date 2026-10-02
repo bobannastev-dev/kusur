@@ -114,7 +114,7 @@ export interface TypeDrops {
 }
 
 /** Првиот ден за кој продавницата има податоци. */
-function historyStart(h: StoreHistory): string {
+export function historyStart(h: StoreHistory): string {
   return h.changes.reduce((min, r) => {
     const d = r.prevDate ?? r.date;
     return d < min ? d : min;
@@ -251,3 +251,12 @@ export function promoCheck(offer: Offer, series: PricePoint[], historyStart: str
           : "genuine";
   return { verdict, promoStart, lowestBefore, loyalty };
 }
+
+/** Пресудата за акција со зборови, за командите и (подоцна) веб-апликацијата. */
+export const PROMO_VERDICT_TEXT: Record<PromoVerdict, string> = {
+  genuine: "вистинска акција (пониско од најниската цена во 30-те дена пред неа)",
+  "not-lower": "не е пониско — во 30-те дена пред акцијата чинело исто или помалку",
+  "regular-raised": "редовната цена е кренана пред попустот",
+  insufficient: "нема доволно историја (помалку од 30 дена)",
+  "not-on-promo": "не е на акција",
+};
