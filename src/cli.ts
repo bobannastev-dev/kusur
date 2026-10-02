@@ -41,8 +41,8 @@ function printPlan(plan: Plan, showStore: boolean) {
       continue;
     }
     const where = showStore ? ` @ ${store.label}` : "";
-    const packs = purchase.divisible ? `на мерење, ${den(purchase.price)}/кг` : `${purchase.packs} × ${den(purchase.price)}`;
     const perKg = purchase.divisible ? "/кг" : "";
+    const packs = purchase.divisible ? `на мерење, ${den(purchase.price)}${perKg}` : `${purchase.packs} × ${den(purchase.price)}`;
     const { regularPrice } = purchase.offer;
     const promo =
       purchase.loyaltyPrice !== null

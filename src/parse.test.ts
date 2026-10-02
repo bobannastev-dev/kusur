@@ -50,6 +50,9 @@ test("parseQuantity: парчиња", () => {
   // „15+" е тежина на детето, „+3ГОД" возраст — не се додаваат.
   assert.deepEqual(parseQuantity("ДЕТСКИ ПЕЛЕНИ БР.6 15+ 40/1 БИОБИА", ["pc"]), { unit: "pc", amount: 40 });
   assert.deepEqual(parseQuantity("ЧЕТКА ЗА ЗАБИ ДЕТСКА ДЕНТАМЕД 2/1 +3ГОД", ["pc"]), { unit: "pc", amount: 2 });
+  // Ролни без однос; „1/N" значи N парчиња како досега, ролните не го надвладуваат.
+  assert.deepEqual(parseQuantity("ТОАЛЕТНА ХАРТИЈА 16 ролни 3сл", ["pc"]), { unit: "pc", amount: 16 });
+  assert.deepEqual(parseQuantity("КУЈНСКИ БРИШАЧ 2рол 1/10", ["pc"]), { unit: "pc", amount: 10 });
   // „РОЛЕТИ" е марка, не број на ролни.
   assert.deepEqual(parseQuantity("ТОАЛЕТ ХАРТ.3СЛ 100% ЦЕЛ.16/1 РОЛЕТИ", ["pc"]), { unit: "pc", amount: 16 });
 });

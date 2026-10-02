@@ -2,7 +2,7 @@
 // чини да се купи потребната количина. Сè овде е обичен, проверлив код.
 
 import type { ProductType } from "./catalog.ts";
-import { parseQuantity, parseUnitPrice } from "./parse.ts";
+import { normalizeLookalikes, parseQuantity, parseUnitPrice } from "./parse.ts";
 import { mapsByProduct, reviewedTypes, TYPE_MAPS, type TypeMaps } from "./type-maps.ts";
 import type { Offer, SnapshotFile } from "./types.ts";
 
@@ -83,9 +83,13 @@ export function passesNameRules(type: ProductType, name: string, context = ""): 
   return true;
 }
 
-/** Текстот врз кој се проверуваат правилата по име. */
+/**
+ * Текстот врз кој се проверуваат правилата по име. Кај синџир без категории и
+ * латиничните „двојници" стануваат кирилични, исто како во предлозите (propose.ts).
+ */
 export function ruleText(offer: Offer, byProduct: boolean): string {
-  return (byProduct ? `${offer.name} | ${offer.description}` : offer.name).toUpperCase();
+  if (!byProduct) return offer.name.toUpperCase();
+  return `${normalizeLookalikes(offer.name)} | ${normalizeLookalikes(offer.description)}`;
 }
 
 /** Дали редот од ценовникот е од дадениот тип (без да се гледа количината). */

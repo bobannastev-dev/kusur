@@ -73,3 +73,17 @@ test("правилата по име важат и за мапата на про
   const maps: TypeMaps = { categories: {}, products: { К: { "ОРИЗ ИНТЕГРАЛЕН 1КГ": ["oriz"] } } };
   assert.equal(cheapestPurchase(k, oriz, 1, maps), null);
 });
+
+test("comparisonPrice: стара снимка без вид на акција (пред промената) е обична цена", () => {
+  // Снимките пред 2026-10-02 немаат `promoKind` во JSON-от.
+  const { promoKind: _, ...old } = offer("ОРИЗ 1 КГ", 90, 130, null);
+  assert.deepEqual(comparisonPrice(old as Offer), { price: 90, loyaltyPrice: null });
+});
+
+test("клуб-цена кај производ на мерење: цена по кг без картичка", () => {
+  const pile = CATALOG.find((t) => t.id === "pile")!;
+  const r = store("Р", [{ ...offer("ПИЛЕ ГРИЛ ЗАМРЗНАТО КГ", 400, 500, "ЛОЈАЛНОСТ", "ПИЛЕ"), unitPriceText: "1 КГ: =400ДЕН" }]);
+  const maps: TypeMaps = { products: {}, categories: { Р: { "ПИЛЕ": ["pile"] } } };
+  const p = cheapestPurchase(r, pile, 0.5, maps)!;
+  assert.deepEqual([p.divisible, p.price, p.cost, p.loyaltyPrice], [true, 500, 250, 400]);
+});

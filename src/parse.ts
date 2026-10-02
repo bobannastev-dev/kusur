@@ -116,7 +116,9 @@ export function parseQuantity(name: string, units: Unit[]): { unit: Unit; amount
 
     const ratio = PACK_RATIO_RE.exec(n);
     const rolls = ROLLS_RE.exec(n);
-    if (rolls) {
+    // „16рол 3/1" = 3 пакувања по 16; „2рол 1/10" е однос „1/N" и го чита долу.
+    const oneToMany = ratio && Number(ratio[1]) === 1 && Number(ratio[2]) > 1;
+    if (rolls && !oneToMany) {
       const packs = ratio && Number(ratio[2]) === 1 ? Number(ratio[1]) : 1;
       return { unit: "pc", amount: packs * Number(rolls[1]) };
     }
@@ -134,4 +136,18 @@ export function parseQuantity(name: string, units: Unit[]): { unit: Unit; amount
   }
 
   return null;
+}
+
+// Латинични букви што изгледаат како кирилични („ПИЈАЛAК" со латинско A).
+const LOOKALIKES: Record<string, string> = { A: "А", B: "В", C: "С", E: "Е", H: "Н", K: "К", M: "М", O: "О", P: "Р", T: "Т", X: "Х", Y: "У", J: "Ј" };
+export const CYRILLIC = /[\u0400-\u04FF]/;
+
+/** Големи букви; во зборовите што имаат кирилица, латиничните „двојници" стануваат кирилични. */
+export function normalizeLookalikes(text: string): string {
+  return text
+    .toUpperCase()
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((w) => (CYRILLIC.test(w) ? w.replace(/[ABCEHKMOPTXYJ]/g, (c) => LOOKALIKES[c]) : w))
+    .join(" ");
 }

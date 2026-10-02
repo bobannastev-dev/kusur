@@ -86,6 +86,15 @@ for (const store of snapshots.filter((s) => mapsByProduct(TYPE_MAPS, s.chain))) 
   }
 }
 
+// 4. Видови акција по синџир: нов вид (на пр. уште една клуб-цена) треба да се
+//    разгледа во comparisonPrice (src/match.ts).
+console.log("\nВидови акција:");
+for (const store of snapshots) {
+  const kinds = Map.groupBy(store.offers.filter((o) => o.promoKind), (o) => o.promoKind!);
+  const list = [...kinds].map(([kind, offers]) => `${kind} ${offers.length}`).join(", ");
+  console.log(`  ${store.chain}: ${list || "нема"}`);
+}
+
 console.log(`\nТипови без ниеден производ: ${empty.length ? empty.join(", ") : "нема"}`);
 console.log(`Мапирања без ниеден производ: ${suspicious.length ? "" : "нема"}`);
 for (const s of suspicious) console.log(`  ${s}`);
