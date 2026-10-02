@@ -17,6 +17,7 @@
     "propose": "node src/propose-cli.ts",
     "drops": "node src/drops-cli.ts",
     "history": "node src/history-cli.ts",
+    "brands": "node src/brands-cli.ts",
     "build-data": "node src/publish/build-data.ts",
     "dev": "next dev",
     "build": "npm run build-data && next build"

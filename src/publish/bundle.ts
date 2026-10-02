@@ -40,6 +40,7 @@ export interface BundleCandidate {
   /** траење на акцијата */ u?: string;
   /** количина на пакувањето */ a: number;
   /** на мерење */ d?: 1;
+  /** бренд (ид од data/brands.json) */ b?: string;
   /** исчезнат: го нема денес, само за „тогаш" */ g?: 1;
   /** историја; без неа: само денешната цена */ s?: BundlePoint[];
 }
@@ -51,6 +52,8 @@ export interface PriceBundle {
   stores: BundleStore[];
   /** тип → продавница → кандидати */
   types: Record<string, Record<string, BundleCandidate[]>>;
+  /** Имињата за приказ на брендовите што ги има во `types` (ид → „Nescafé"). */
+  brands?: Record<string, string>;
 }
 
 export function toOffer(c: BundleCandidate): Offer {
@@ -109,7 +112,9 @@ export function fromBundle(bundle: PriceBundle): BundleView {
         list.map((c) => {
           const offer = toOffer(c);
           const series = c.s ? toPoints(c.s) : [{ date, price: c.p, comparable: comparisonPrice(offer).price }];
-          return { candidate: { offer, packAmount: c.a, divisible: c.d === 1 }, gone: c.g === 1, series };
+          const candidate: Candidate = { offer, packAmount: c.a, divisible: c.d === 1 };
+          if (c.b) candidate.brand = c.b;
+          return { candidate, gone: c.g === 1, series };
         }),
       );
     }

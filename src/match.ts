@@ -1,6 +1,7 @@
 // Поврзување: кои редови од ценовникот одговараат на тип производ и колку
 // чини да се купи потребната количина. Сè овде е обичен, проверлив код.
 
+import { brandOf } from "./brands.ts";
 import type { ProductType } from "./catalog.ts";
 import { normalizeLookalikes, parseQuantity, parseUnitPrice } from "./parse.ts";
 import { mapsByProduct, reviewedTypes, defaultTypeMaps, type TypeMaps } from "./type-maps.ts";
@@ -17,6 +18,8 @@ export interface Candidate {
   packAmount: number;
   /** Се мери на каса — може да се купи точно потребната количина. */
   divisible: boolean;
+  /** Ид на брендот (data/brands.json), ако е препознаен. */
+  brand?: string;
 }
 
 export interface Purchase extends Candidate {
@@ -103,7 +106,9 @@ export function findCandidates(store: SnapshotFile, type: ProductType, maps: Typ
   for (const offer of store.offers) {
     if (!matchesType(offer, store.chain, type, maps)) continue;
     const pack = resolvePack(offer, type);
-    if (pack) candidates.push({ offer, ...pack });
+    if (!pack) continue;
+    const brand = maps.brands && brandOf(offer, type.id, maps.brands);
+    candidates.push(brand ? { offer, ...pack, brand } : { offer, ...pack });
   }
   return candidates;
 }

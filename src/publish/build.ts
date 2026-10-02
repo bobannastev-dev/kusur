@@ -17,6 +17,7 @@ export function buildBundle(histories: StoreHistory[], types: ProductType[], map
   const prepared = histories.map((h) => prepareStore(h, (known, type) => findCandidates(known, type, maps)));
 
   const bundleTypes: PriceBundle["types"] = {};
+  const usedBrands = new Set<string>();
   for (const type of types) {
     const byStore: Record<string, BundleCandidate[]> = {};
     for (const [i, store] of prepared.entries()) {
@@ -27,6 +28,10 @@ export function buildBundle(histories: StoreHistory[], types: ProductType[], map
         if (o.promoKind) entry.k = o.promoKind;
         if (o.promoUntil) entry.u = o.promoUntil;
         if (c.divisible) entry.d = 1;
+        if (c.brand) {
+          entry.b = c.brand;
+          usedBrands.add(c.brand);
+        }
         if (!store.isCurrent(o.name)) entry.g = 1;
 
         // Без историја кога е само денешната цена (најчестиот случај): ја гради телефонот.
@@ -45,9 +50,12 @@ export function buildBundle(histories: StoreHistory[], types: ProductType[], map
     bundleTypes[type.id] = byStore;
   }
 
+  const brands = Object.fromEntries([...usedBrands].sort().map((id) => [id, maps.brands![id].label]));
+
   return {
     version: BUNDLE_VERSION,
     date,
+    ...(usedBrands.size ? { brands } : {}),
     stores: histories.map((h, i) => ({
       id: h.snapshot.storeId,
       chain: h.snapshot.chain,

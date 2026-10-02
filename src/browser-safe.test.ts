@@ -6,7 +6,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { test } from "node:test";
 
-const BROWSER_ENTRIES = ["basket.ts", "history.ts", "match.ts", "list.ts", "catalog.ts", "parse.ts", "dates.ts", "type-maps.ts", "publish/bundle.ts"];
+const BROWSER_ENTRIES = ["basket.ts", "history.ts", "match.ts", "list.ts", "catalog.ts", "parse.ts", "dates.ts", "type-maps.ts", "brands.ts", "publish/bundle.ts"];
 
 /** Статичките увози (не `import type`) на модулот. */
 function imports(file: string): string[] {

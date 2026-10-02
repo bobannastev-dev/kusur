@@ -1,0 +1,4 @@
+{
+  "nescafe": { "label": "Nescafé", "patterns": ["НЕСКАФЕ", "NESCAFE", "NESCAFÉ"], "types": ["instant-kafe"], "aliases": ["нескафе"] },
+  "persil": { "label": "Персил", "patterns": ["ПЕРСИЛ", "PERSIL"], "types": ["prashok", "techen-detergent", "kapsuli-perenje"], "aliases": ["персил"] }
+}
