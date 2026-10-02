@@ -5,7 +5,8 @@
 import { runByHost } from "./fetch-plan.ts";
 import { isStale } from "./freshness.ts";
 import { REQUEST_DELAY_MS } from "./net.ts";
-import { saveSnapshot } from "./snapshots.ts";
+import { recordFetch } from "./price-store.ts";
+import { createFilePriceStore } from "./price-store-file.ts";
 import { STORES } from "./stores.ts";
 
 const filter = process.argv[2];
@@ -16,6 +17,7 @@ if (stores.length === 0) {
 }
 
 const date = new Date().toLocaleDateString("sv-SE"); // локален датум како YYYY-MM-DD
+const priceStore = createFilePriceStore();
 const started = Date.now();
 const secondsSince = (t: number) => ((Date.now() - t) / 1000).toFixed(0);
 
@@ -29,7 +31,7 @@ const results = await runByHost(
       // Празен ценовник не смее да ги замени вчерашните цени со „ништо".
       if (offers.length === 0) throw new Error("празен ценовник");
       const fetchedAt = new Date().toISOString();
-      await saveSnapshot(date, {
+      const changes = await recordFetch(priceStore, date, {
         storeId: store.id,
         chain: store.chain,
         label: store.label,
@@ -37,12 +39,16 @@ const results = await runByHost(
         fetchedAt,
         updatedAt,
         offers,
+        completeness,
       });
       const stale = isStale({ updatedAt, fetchedAt }) ? " ЗАСТАРЕНО (маркетот не го ажурирал ценовникот над 2 дена)" : "";
       const passes = completeness
         ? `, ${completeness.passes} поминув.${offers.length < completeness.expected ? `, НЕДОСТИГААТ ${completeness.expected - offers.length} од ${completeness.expected}` : ""}`
         : "";
       console.log(`✓ ${store.label}: ${offers.length} производи (ажурирано: ${updatedAt ?? "непознато"}${passes}) — ${secondsSince(t)} сек${stale}`);
+      const since = changes.prevDate ? `од ${changes.prevDate}` : "прва снимка";
+      const notes = changes.notes.length ? ` (${changes.notes.join("; ")})` : "";
+      console.log(`    промени ${since}: ${changes.changed.length} цени, ${changes.added.length} нови, ${changes.removed.length} исчезнати${notes}`);
     } catch (err) {
       console.error(`✗ ${store.label}: ${err instanceof Error ? err.message : err} — ${secondsSince(t)} сек`);
       throw err;

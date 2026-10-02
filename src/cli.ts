@@ -5,7 +5,8 @@
 import { compareBasket, type Plan } from "./basket.ts";
 import { CATALOG } from "./catalog.ts";
 import { parseList } from "./list.ts";
-import { loadLatestSnapshots } from "./snapshots.ts";
+import { loadCurrentSnapshots } from "./price-store-file.ts";
+import { STORES } from "./stores.ts";
 import type { Unit } from "./types.ts";
 
 const args = process.argv.slice(2);
@@ -49,7 +50,7 @@ function printPlan(plan: Plan, showStore: boolean) {
   }
 }
 
-const { date, snapshots } = await loadLatestSnapshots();
+const { snapshots, dates } = await loadCurrentSnapshots(new Set(STORES.map((s) => s.id)));
 const { lines, unknown } = parseList(input);
 
 if (lines.length === 0) {
@@ -60,7 +61,7 @@ if (lines.length === 0) {
 const { single, best } = compareBasket(snapshots, lines, maxStores);
 
 console.log(`\nКошничка: ${lines.map((l) => `${l.type.label} (${formatAmount(l.need, l.type.unit)})`).join(", ")}`);
-console.log(`Цени од ${date} · ${snapshots.map((s) => s.label).join(", ")}`);
+console.log(`Цени од ${dates.join(" – ")} · ${snapshots.map((s) => s.label).join(", ")}`);
 if (unknown.length > 0) console.log(`Не препознав: ${unknown.join(", ")}`);
 
 console.log("\n── Цела кошничка во една продавница ──");

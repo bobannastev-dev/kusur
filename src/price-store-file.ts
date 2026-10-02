@@ -1,0 +1,86 @@
+// PriceStore во датотеки:
+//   <root>/snapshots/<YYYY-MM-DD>/<storeId>.json — ценовник
+//   <root>/changes/<YYYY-MM-DD>/<storeId>.json   — промени наспроти претходната снимка
+
+import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
+import path from "node:path";
+import type { ChangesRecord, PriceStore } from "./price-store.ts";
+import type { SnapshotFile } from "./types.ts";
+
+export const DATA_DIR = path.join(import.meta.dirname, "..", "data");
+
+const DATE_DIR = /^\d{4}-\d{2}-\d{2}$/;
+
+async function dates(dir: string): Promise<string[]> {
+  return (await readdir(dir).catch(() => [] as string[])).filter((d) => DATE_DIR.test(d)).sort();
+}
+
+async function readJson<T>(file: string): Promise<T | null> {
+  try {
+    return JSON.parse(await readFile(file, "utf8")) as T;
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code === "ENOENT") return null;
+    throw err;
+  }
+}
+
+async function writeJson(dir: string, name: string, value: unknown): Promise<void> {
+  await mkdir(dir, { recursive: true });
+  await writeFile(path.join(dir, `${name}.json`), JSON.stringify(value), "utf8");
+}
+
+/**
+ * Најновите снимки само за продавниците што се уште во регистарот
+ * (стари снимки од изоставени продавници остануваат на диск, но не се користат).
+ */
+export async function loadCurrentSnapshots(storeIds: Set<string>, store: PriceStore = createFilePriceStore()) {
+  const latest = (await store.latestSnapshots()).filter((l) => storeIds.has(l.snapshot.storeId));
+  if (latest.length === 0) throw new Error("Нема преземени ценовници. Прво пушти: npm run fetch");
+  const dates = [...new Set(latest.map((l) => l.date))].sort();
+  return { snapshots: latest.map((l) => l.snapshot), dates };
+}
+
+export function createFilePriceStore(root: string = DATA_DIR): PriceStore {
+  const snapshotsDir = path.join(root, "snapshots");
+  const changesDir = path.join(root, "changes");
+
+  return {
+    saveSnapshot: (date, snapshot) => writeJson(path.join(snapshotsDir, date), snapshot.storeId, snapshot),
+
+    async latestSnapshot(storeId, beforeDate) {
+      for (const date of (await dates(snapshotsDir)).reverse()) {
+        if (beforeDate && date >= beforeDate) continue;
+        const snapshot = await readJson<SnapshotFile>(path.join(snapshotsDir, date, `${storeId}.json`));
+        if (snapshot) return { date, snapshot };
+      }
+      return null;
+    },
+
+    async latestSnapshots() {
+      const found = new Map<string, { date: string; snapshot: SnapshotFile }>();
+      for (const date of (await dates(snapshotsDir)).reverse()) {
+        for (const file of await readdir(path.join(snapshotsDir, date))) {
+          const storeId = file.replace(/\.json$/, "");
+          if (!file.endsWith(".json") || found.has(storeId)) continue;
+          const snapshot = await readJson<SnapshotFile>(path.join(snapshotsDir, date, file));
+          if (snapshot) found.set(storeId, { date, snapshot });
+        }
+      }
+      return [...found.values()];
+    },
+
+    saveChanges: (record) => writeJson(path.join(changesDir, record.date), record.storeId, record),
+
+    async changesBetween(from, to) {
+      const records: ChangesRecord[] = [];
+      for (const date of await dates(changesDir)) {
+        if (date < from || date > to) continue;
+        for (const file of (await readdir(path.join(changesDir, date))).sort()) {
+          const record = await readJson<ChangesRecord>(path.join(changesDir, date, file));
+          if (record) records.push(record);
+        }
+      }
+      return records;
+    },
+  };
+}

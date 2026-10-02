@@ -9,11 +9,12 @@
 import { CATALOG } from "./catalog.ts";
 import { CATEGORY_MAP, typesFor } from "./category-map.ts";
 import { findCandidates, matchesType } from "./match.ts";
-import { loadLatestSnapshots } from "./snapshots.ts";
+import { loadCurrentSnapshots } from "./price-store-file.ts";
+import { STORES } from "./stores.ts";
 import type { SnapshotFile } from "./types.ts";
 
-const latest = await loadLatestSnapshots();
-console.log(`Ценовници од ${latest.date}: ${latest.snapshots.length} продавници\n`);
+const latest = await loadCurrentSnapshots(new Set(STORES.map((s) => s.id)));
+console.log(`Ценовници од ${latest.dates.join(" – ")}: ${latest.snapshots.length} продавници\n`);
 
 // Мапата е по синџир, па продавниците од ист синџир се спојуваат: секој производ
 // (по име) еднаш, од која било продавница каде го има.
