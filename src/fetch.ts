@@ -3,6 +3,7 @@
 //           npm run fetch -- zito    (само продавници чиј id почнува со „zito")
 
 import { runByHost } from "./fetch-plan.ts";
+import { isStale } from "./freshness.ts";
 import { REQUEST_DELAY_MS } from "./net.ts";
 import { saveSnapshot } from "./snapshots.ts";
 import { STORES } from "./stores.ts";
@@ -27,19 +28,21 @@ const results = await runByHost(
       const { updatedAt, offers, completeness } = await store.fetchOffers();
       // Празен ценовник не смее да ги замени вчерашните цени со „ништо".
       if (offers.length === 0) throw new Error("празен ценовник");
+      const fetchedAt = new Date().toISOString();
       await saveSnapshot(date, {
         storeId: store.id,
         chain: store.chain,
         label: store.label,
         city: store.city,
-        fetchedAt: new Date().toISOString(),
+        fetchedAt,
         updatedAt,
         offers,
       });
+      const stale = isStale({ updatedAt, fetchedAt }) ? " ЗАСТАРЕНО (маркетот не го ажурирал ценовникот над 2 дена)" : "";
       const passes = completeness
         ? `, ${completeness.passes} поминув.${offers.length < completeness.expected ? `, НЕДОСТИГААТ ${completeness.expected - offers.length} од ${completeness.expected}` : ""}`
         : "";
-      console.log(`✓ ${store.label}: ${offers.length} производи (ажурирано: ${updatedAt ?? "непознато"}${passes}) — ${secondsSince(t)} сек`);
+      console.log(`✓ ${store.label}: ${offers.length} производи (ажурирано: ${updatedAt ?? "непознато"}${passes}) — ${secondsSince(t)} сек${stale}`);
     } catch (err) {
       console.error(`✗ ${store.label}: ${err instanceof Error ? err.message : err} — ${secondsSince(t)} сек`);
       throw err;
