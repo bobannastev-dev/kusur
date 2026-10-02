@@ -26,6 +26,7 @@
 | `basket` | Список → типови и количини; цена на кошничката по продавница; најдобар план со најмногу 2 продавници | `product-matching` | `SPEC-basket.md` |
 | `price-history` | Историја од промените; „следени производи" (во прелистувачот) и приказ на поевтинетите при отворање | `price-ingest`, `product-matching` | `SPEC-price-history.md` |
 | `price-reports` | Анонимна пријава на погрешна цена/спарување; листа за преглед | `product-matching` | `SPEC-price-reports.md` |
+| `item-options` | Колку точно е ставката: кој било / бренд / ист производ (бренд + грамажа), замена со образложение; свинско месо по делови | `product-matching`, `basket` | `SPEC-item-options.md` |
 | `web-app` | Next.js апликација за телефон што ги поврзува модулите | `basket`, `price-history`, `price-reports` | `SPEC-web-app.md` |
 
 Ред на градење: `price-ingest` → `product-matching` → `basket`, `price-history`, `price-reports` → `web-app`
