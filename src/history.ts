@@ -1,8 +1,11 @@
 // Историја на цените од дневните промени (ChangesRecord): колку чинел производот
 // кој било ден. Чисти функции — читањето од PriceStore е во командите.
 
+import type { ProductType } from "./catalog.ts";
+import { comparisonPrice, findCandidates, type Candidate } from "./match.ts";
 import type { ChangesRecord } from "./price-store.ts";
-import type { Offer } from "./types.ts";
+import { TYPE_MAPS, type TypeMaps } from "./type-maps.ts";
+import type { Offer, SnapshotFile } from "./types.ts";
 
 /** Набљудување: цената тој ден, или null ако производот го немало. */
 export interface PricePoint {
@@ -23,39 +26,39 @@ const WEIGHT = {
 } as const;
 
 /**
- * Серија на цени за производ во една продавница, по датум.
+ * Серии на цени за сите производи на една продавница, со едно поминување низ промените.
  * `changes` се записите на таа продавница; `current` е нејзината најнова снимка.
  */
-export function priceSeries(
-  changes: ChangesRecord[],
-  current: { date: string; offer: Offer | undefined },
-  name: string,
-): PricePoint[] {
-  const points = new Map<string, { point: PricePoint; weight: number }>();
-  const put = (point: PricePoint, weight: number) => {
+export function allSeries(changes: ChangesRecord[], current: { date: string; offers: Offer[] }): Map<string, PricePoint[]> {
+  const byName = new Map<string, Map<string, { point: PricePoint; weight: number }>>();
+  const put = (name: string, point: PricePoint, weight: number) => {
+    let points = byName.get(name);
+    if (!points) byName.set(name, (points = new Map()));
     const existing = points.get(point.date);
     if (!existing || weight >= existing.weight) points.set(point.date, { point, weight });
   };
 
   for (const r of [...changes].sort((a, b) => a.date.localeCompare(b.date))) {
-    const added = r.added.find((o) => o.name === name);
-    if (added) put({ date: r.date, price: added.price, added: true }, WEIGHT.sameDay);
-
-    const changed = r.changed.find((c) => c.name === name);
-    if (changed) {
-      if (r.prevDate) put({ date: r.prevDate, price: changed.oldPrice }, WEIGHT.previous);
-      put({ date: r.date, price: changed.newPrice }, WEIGHT.sameDay);
+    for (const o of r.added) put(o.name, { date: r.date, price: o.price, added: true }, WEIGHT.sameDay);
+    for (const c of r.changed) {
+      if (r.prevDate) put(c.name, { date: r.prevDate, price: c.oldPrice }, WEIGHT.previous);
+      put(c.name, { date: r.date, price: c.newPrice }, WEIGHT.sameDay);
     }
-
-    const removed = r.removed.find((o) => o.name === name);
-    if (removed) {
-      if (r.prevDate) put({ date: r.prevDate, price: removed.price }, WEIGHT.previous);
-      put({ date: r.date, price: null }, WEIGHT.sameDay);
+    for (const o of r.removed) {
+      if (r.prevDate) put(o.name, { date: r.prevDate, price: o.price }, WEIGHT.previous);
+      put(o.name, { date: r.date, price: null }, WEIGHT.sameDay);
     }
   }
-  if (current.offer) put({ date: current.date, price: current.offer.price }, WEIGHT.current);
+  for (const o of current.offers) put(o.name, { date: current.date, price: o.price }, WEIGHT.current);
 
-  return [...points.values()].map((p) => p.point).sort((a, b) => a.date.localeCompare(b.date));
+  return new Map(
+    [...byName].map(([name, points]) => [name, [...points.values()].map((p) => p.point).sort((a, b) => a.date.localeCompare(b.date))]),
+  );
+}
+
+/** Серија на цени за еден производ во една продавница. */
+export function priceSeries(changes: ChangesRecord[], current: { date: string; offer: Offer | undefined }, name: string): PricePoint[] {
+  return allSeries(changes, { date: current.date, offers: current.offer ? [current.offer] : [] }).get(name) ?? [];
 }
 
 /**
@@ -71,4 +74,99 @@ export function priceOn(series: PricePoint[], date: string): number | null {
   if (last) return last.price;
   const first = series[0];
   return !first || first.added ? null : first.price;
+}
+
+// ── Поевтинето од датум ──
+
+/** Колку мора да падне цената за да се смета за поевтинување. */
+export const DROP_THRESHOLD = 0.05;
+
+/** Една продавница: најновата снимка и нејзините промени. */
+export interface StoreHistory {
+  date: string;
+  snapshot: SnapshotFile;
+  changes: ChangesRecord[];
+}
+
+export interface Drop {
+  store: SnapshotFile;
+  /** Денешниот ред од ценовникот. */
+  offer: Offer;
+  oldPrice: number;
+  /** Денешната цена за споредба (без клуб-картичка). */
+  newPrice: number;
+}
+
+export interface UnitBest {
+  store: SnapshotFile;
+  offer: Offer;
+  /** Цена по единица на типот (ден/кг, ден/л, ден/парче). */
+  unitPrice: number;
+}
+
+export interface TypeDrops {
+  type: ProductType;
+  /** Датумот со кој е споредено (може да е подоцна од бараниот, види `sinceAdjusted`). */
+  since: string;
+  sinceAdjusted: boolean;
+  drops: Drop[];
+  cheapest: { then: UnitBest | null; now: UnitBest | null; dropped: boolean };
+}
+
+/** Првиот ден за кој продавницата има податоци. */
+function historyStart(h: StoreHistory): string {
+  return h.changes.reduce((min, r) => {
+    const d = r.prevDate ?? r.date;
+    return d < min ? d : min;
+  }, h.date);
+}
+
+const isDrop = (oldPrice: number, newPrice: number) => newPrice <= oldPrice * (1 - DROP_THRESHOLD) + 1e-9;
+
+const unitOf = (c: Candidate, price: number) => Number((price / c.packAmount).toFixed(2));
+
+function cheaper(a: UnitBest | null, b: UnitBest): UnitBest {
+  return !a || b.unitPrice < a.unitPrice ? b : a;
+}
+
+/**
+ * За секој тип: производите поевтинети за најмалку 5% од `since` до денес, и
+ * најевтиното по единица тогаш и денес. Количината на пакувањето е од денешниот
+ * ред (или последниот познат за производ што исчезнал) — историската цена се
+ * дели со неа, бидејќи единечната цена во ценовникот важи за денешната цена.
+ */
+export function dropsSince(stores: StoreHistory[], types: ProductType[], since: string, maps: TypeMaps = TYPE_MAPS): TypeDrops[] {
+  const start = stores.map(historyStart).sort()[0] ?? since;
+  const effective = since < start ? start : since;
+
+  const prepared = stores.map((h) => {
+    const series = allSeries(h.changes, { date: h.date, offers: h.snapshot.offers });
+    const current = new Set(h.snapshot.offers.map((o) => o.name));
+    // Исчезнатите производи (последниот познат ред) учествуваат само во „тогаш".
+    const gone = new Map<string, Offer>();
+    for (const r of h.changes) for (const o of r.removed) if (!current.has(o.name)) gone.set(o.name, o);
+    const known: SnapshotFile = { ...h.snapshot, offers: [...h.snapshot.offers, ...gone.values()] };
+    return { h, series, current, known };
+  });
+
+  return types.map((type) => {
+    const drops: Drop[] = [];
+    let then: UnitBest | null = null;
+    let now: UnitBest | null = null;
+
+    for (const { h, series, current, known } of prepared) {
+      for (const c of findCandidates(known, type, maps)) {
+        const oldPrice = priceOn(series.get(c.offer.name) ?? [], effective);
+        if (oldPrice !== null) then = cheaper(then, { store: h.snapshot, offer: c.offer, unitPrice: unitOf(c, oldPrice) });
+        if (!current.has(c.offer.name)) continue;
+
+        const newPrice = comparisonPrice(c.offer).price;
+        now = cheaper(now, { store: h.snapshot, offer: c.offer, unitPrice: unitOf(c, newPrice) });
+        if (oldPrice !== null && isDrop(oldPrice, newPrice)) drops.push({ store: h.snapshot, offer: c.offer, oldPrice, newPrice });
+      }
+    }
+
+    const dropped = then !== null && now !== null && isDrop(then.unitPrice, now.unitPrice);
+    return { type, since: effective, sinceAdjusted: effective !== since, drops, cheapest: { then, now, dropped } };
+  });
 }

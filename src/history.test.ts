@@ -1,9 +1,11 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import type { PriceChange } from "./changes.ts";
-import { priceOn, priceSeries } from "./history.ts";
+import { CATALOG } from "./catalog.ts";
+import { dropsSince, priceOn, priceSeries, type StoreHistory } from "./history.ts";
 import type { ChangesRecord } from "./price-store.ts";
-import type { Offer } from "./types.ts";
+import type { TypeMaps } from "./type-maps.ts";
+import type { Offer, SnapshotFile } from "./types.ts";
 
 function offer(name: string, price: number, extra: Partial<Offer> = {}): Offer {
   return { name, price, regularPrice: null, unitPriceText: "", category: "", description: "", promoKind: null, promoUntil: null, ...extra };
@@ -56,4 +58,57 @@ test("серија: производ што исчезнал и не се вра
   assert.equal(priceOn(series, "2026-01-02"), 60);
   assert.equal(priceOn(series, "2026-01-05"), null);
   assert.equal(priceOn(series, "2026-01-20"), null);
+});
+
+// ── Поевтинето од датум ──
+
+const mleko = CATALOG.find((t) => t.id === "mleko")!;
+const MAPS: TypeMaps = { products: {}, categories: { Ж: { "МЛЕКО": ["mleko"] } } };
+const milk = (name: string, price: number, extra: Partial<Offer> = {}) => offer(name, price, { category: "МЛЕКО", ...extra });
+
+function history(date: string, offers: Offer[], changes: ChangesRecord[]): StoreHistory {
+  const snapshot: SnapshotFile = { storeId: "s", chain: "Ж", label: "Ж", city: "Велес", fetchedAt: "", updatedAt: null, offers };
+  return { date, snapshot, changes };
+}
+
+test("поевтинето: 5% е поевтинување, 4% не е", () => {
+  const h = history("2026-01-10", [milk("МЛЕКО А 1Л", 95), milk("МЛЕКО Б 1Л", 96)], [
+    record("2026-01-05", "2026-01-04", { changed: [change("МЛЕКО А 1Л", 100, 95), change("МЛЕКО Б 1Л", 100, 96)] }),
+  ]);
+  const [result] = dropsSince([h], [mleko], "2026-01-01", MAPS);
+  assert.deepEqual(result.drops.map((d) => [d.offer.name, d.oldPrice, d.newPrice]), [["МЛЕКО А 1Л", 100, 95]]);
+});
+
+test("поевтинето: клуб-цената не е поевтинување", () => {
+  const h = history("2026-01-10", [milk("МЛЕКО 1Л", 45, { regularPrice: 55, promoKind: "ЛОЈАЛНОСТ" })], [
+    record("2026-01-05", "2026-01-04", { changed: [change("МЛЕКО 1Л", 55, 45)] }),
+  ]);
+  assert.deepEqual(dropsSince([h], [mleko], "2026-01-01", MAPS)[0].drops, []);
+});
+
+test("поевтинето: нов производ не е поевтинување; најевтино по литар е", () => {
+  const h = history("2026-01-10", [milk("МЛЕКО 1Л", 60), milk("МЛЕКО 2Л", 100)], [
+    record("2026-01-05", "2026-01-04", { added: [milk("МЛЕКО 2Л", 100)] }),
+  ]);
+  const [result] = dropsSince([h], [mleko], "2026-01-01", MAPS);
+  assert.deepEqual(result.drops, []);
+  assert.deepEqual([result.cheapest.then?.unitPrice, result.cheapest.now?.unitPrice, result.cheapest.dropped], [60, 50, true]);
+  assert.equal(result.cheapest.now?.offer.name, "МЛЕКО 2Л");
+});
+
+test("поевтинето: најевтиното тогаш го брои и производот што потоа исчезнал", () => {
+  // Тогаш: 1Л за 50 (потоа исчезнат) и 1Л за 60. Денес само 60 → нема поевтинување.
+  const h = history("2026-01-10", [milk("МЛЕКО Б 1Л", 60)], [
+    record("2026-01-05", "2026-01-04", { removed: [milk("МЛЕКО А 1Л", 50)] }),
+  ]);
+  const [result] = dropsSince([h], [mleko], "2026-01-01", MAPS);
+  assert.deepEqual([result.cheapest.then?.unitPrice, result.cheapest.now?.unitPrice, result.cheapest.dropped], [50, 60, false]);
+});
+
+test("поевтинето: датум пред почетокот на историјата → првиот достапен ден", () => {
+  const h = history("2026-01-10", [milk("МЛЕКО 1Л", 90)], [
+    record("2026-01-05", "2026-01-04", { changed: [change("МЛЕКО 1Л", 100, 90)] }),
+  ]);
+  const [result] = dropsSince([h], [mleko], "2025-06-01", MAPS);
+  assert.deepEqual([result.since, result.sinceAdjusted, result.drops.length], ["2026-01-04", true, 1]);
 });
