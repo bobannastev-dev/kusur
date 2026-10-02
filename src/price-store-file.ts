@@ -2,7 +2,7 @@
 //   <root>/snapshots/<YYYY-MM-DD>/<storeId>.json — ценовник
 //   <root>/changes/<YYYY-MM-DD>/<storeId>.json   — промени наспроти претходната снимка
 
-import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readdir, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 import type { ChangesRecord, PriceStore } from "./price-store.ts";
 import type { SnapshotFile } from "./types.ts";
@@ -24,9 +24,16 @@ async function readJson<T>(file: string): Promise<T | null> {
   }
 }
 
+/**
+ * Прво во привремен фајл, па преименување: ако процесот падне на половина, или
+ * `basket` чита додека `fetch` пишува, никогаш не се гледа половичен JSON.
+ */
 async function writeJson(dir: string, name: string, value: unknown): Promise<void> {
   await mkdir(dir, { recursive: true });
-  await writeFile(path.join(dir, `${name}.json`), JSON.stringify(value), "utf8");
+  const target = path.join(dir, `${name}.json`);
+  const tmp = `${target}.${process.pid}.tmp`;
+  await writeFile(tmp, JSON.stringify(value), "utf8");
+  await rename(tmp, target);
 }
 
 /**
