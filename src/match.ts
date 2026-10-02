@@ -2,8 +2,8 @@
 // чини да се купи потребната количина. Сè овде е обичен, проверлив код.
 
 import type { ProductType } from "./catalog.ts";
-import { CATEGORY_MAP, typesFor, type CategoryMap } from "./category-map.ts";
 import { parseQuantity, parseUnitPrice } from "./parse.ts";
+import { reviewedTypes, TYPE_MAPS, type TypeMaps } from "./type-maps.ts";
 import type { Offer, SnapshotFile } from "./types.ts";
 
 /** Пакување од 900г се смета дека покрива потреба од 1кг (исто 905мл масло за 1л). */
@@ -73,8 +73,8 @@ function resolvePack(offer: Offer, type: ProductType): Pick<Candidate, "packAmou
 }
 
 /** Дали редот од ценовникот е од дадениот тип (без да се гледа количината). */
-export function matchesType(offer: Offer, chain: string, type: ProductType, map: CategoryMap = CATEGORY_MAP): boolean {
-  if (!typesFor(map, chain, offer.category)?.includes(type.id)) return false;
+export function matchesType(offer: Offer, chain: string, type: ProductType, maps: TypeMaps = TYPE_MAPS): boolean {
+  if (!reviewedTypes(maps, chain, offer)?.includes(type.id)) return false;
 
   const name = offer.name.toUpperCase();
   if (type.require && !type.require.test(name)) return false;
@@ -82,10 +82,10 @@ export function matchesType(offer: Offer, chain: string, type: ProductType, map:
   return true;
 }
 
-export function findCandidates(store: SnapshotFile, type: ProductType, map: CategoryMap = CATEGORY_MAP): Candidate[] {
+export function findCandidates(store: SnapshotFile, type: ProductType, maps: TypeMaps = TYPE_MAPS): Candidate[] {
   const candidates: Candidate[] = [];
   for (const offer of store.offers) {
-    if (!matchesType(offer, store.chain, type, map)) continue;
+    if (!matchesType(offer, store.chain, type, maps)) continue;
     const pack = resolvePack(offer, type);
     if (pack) candidates.push({ offer, ...pack });
   }
@@ -106,10 +106,10 @@ export function cheapestPurchase(
   store: SnapshotFile,
   type: ProductType,
   need: number,
-  map: CategoryMap = CATEGORY_MAP,
+  maps: TypeMaps = TYPE_MAPS,
 ): Purchase | null {
   let best: Purchase | null = null;
-  for (const candidate of findCandidates(store, type, map)) {
+  for (const candidate of findCandidates(store, type, maps)) {
     const p = purchase(candidate, need);
     if (p.packs > MAX_PACKS) continue;
     // При иста сума, подобро е пакувањето што дава повеќе.

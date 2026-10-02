@@ -1,17 +1,18 @@
 // Преглед на мапата на категории врз најновите ценовници.
 // Употреба: npm run categories
 //
-// 1. Нови категории што ги нема во data/category-map.json (треба да се прегледаат).
+// 1. Нови категории што ги нема во data/category-map.json (треба да се прегледаат);
+//    кај синџирите без категории (КАМ) — непрегледани производи од data/product-map.json.
 // 2. Колку производи паѓаат во секој тип, по синџир.
 // 3. Категории мапирани на еден тип од кои ниеден производ не поминал низ правилата
 //    (во мешана категорија, на пр. „свеж зеленчук", нормално е некој тип денес да нема).
 
 import { CATALOG } from "./catalog.ts";
-import { CATEGORY_MAP, typesFor } from "./category-map.ts";
 import { findCandidates, matchesType } from "./match.ts";
 import { loadCurrentSnapshots } from "./price-store.ts";
 import { createFilePriceStore } from "./price-store-file.ts";
 import { STORES } from "./stores.ts";
+import { mapsByProduct, reviewedTypes, TYPE_MAPS } from "./type-maps.ts";
 import type { SnapshotFile } from "./types.ts";
 
 const latest = await loadCurrentSnapshots(createFilePriceStore(), new Set(STORES.map((s) => s.id)));
@@ -27,12 +28,18 @@ const snapshots: SnapshotFile[] = [...Map.groupBy(latest.snapshots, (s) => s.cha
     offers: [...new Map(stores.flatMap((s) => s.offers).map((o) => [o.name, o] as const)).values()],
   }));
 
-// 1. Нови категории
+// 1. Нови категории; непрегледани производи
 let newCount = 0;
-for (const store of snapshots) {
+for (const store of snapshots.filter((s) => mapsByProduct(TYPE_MAPS, s.chain))) {
+  const unreviewed = store.offers.filter((o) => reviewedTypes(TYPE_MAPS, store.chain, o) === undefined);
+  console.log(`${store.chain}: непрегледани производи ${unreviewed.length} од ${store.offers.length} (npm run propose)`);
+  for (const o of unreviewed.slice(0, 10)) console.log(`  ${o.name} — ${o.description}`);
+  if (unreviewed.length > 10) console.log(`  … уште ${unreviewed.length - 10}`);
+}
+for (const store of snapshots.filter((s) => !mapsByProduct(TYPE_MAPS, s.chain))) {
   const fresh = new Map<string, string[]>();
   for (const o of store.offers) {
-    if (typesFor(CATEGORY_MAP, store.chain, o.category) !== undefined) continue;
+    if (reviewedTypes(TYPE_MAPS, store.chain, o) !== undefined) continue;
     const names = fresh.get(o.category) ?? [];
     names.push(o.name);
     fresh.set(o.category, names);
@@ -53,12 +60,12 @@ for (const type of CATALOG) {
   if (counts.every((c) => c === 0)) empty.push(type.label);
 }
 
-// 3. Сомнителни мапирања
+// 3. Сомнителни мапирања (само мапата на категории)
 const suspicious: string[] = [];
-for (const store of snapshots) {
+for (const store of snapshots.filter((s) => !mapsByProduct(TYPE_MAPS, s.chain))) {
   const byCategory = Map.groupBy(store.offers, (o) => o.category);
   for (const [category, offers] of byCategory) {
-    const ids = typesFor(CATEGORY_MAP, store.chain, category) ?? [];
+    const ids = reviewedTypes(TYPE_MAPS, store.chain, offers[0]) ?? [];
     if (ids.length !== 1) continue;
     for (const id of ids) {
       const type = CATALOG.find((t) => t.id === id)!;

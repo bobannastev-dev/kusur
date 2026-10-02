@@ -1,9 +1,9 @@
 // Планирање на набавката: колку чини целата кошничка во секоја продавница
 // и дали вреди да се подели на повеќе продавници.
 
-import { CATEGORY_MAP, type CategoryMap } from "./category-map.ts";
 import type { BasketLine } from "./list.ts";
 import { cheapestPurchase, type Purchase } from "./match.ts";
+import { TYPE_MAPS, type TypeMaps } from "./type-maps.ts";
 import type { SnapshotFile } from "./types.ts";
 
 export interface PlanItem {
@@ -67,10 +67,10 @@ export function compareBasket(
   stores: SnapshotFile[],
   lines: BasketLine[],
   maxStores = 2,
-  map: CategoryMap = CATEGORY_MAP,
+  maps: TypeMaps = TYPE_MAPS,
 ): BasketComparison {
   const grid: PurchaseGrid = new Map(
-    stores.map((s) => [s, lines.map((line) => cheapestPurchase(s, line.type, line.need, map))]),
+    stores.map((s) => [s, lines.map((line) => cheapestPurchase(s, line.type, line.need, maps))]),
   );
 
   const single = stores.map((s) => planFor([s], lines, grid)).sort((a, b) => (isBetter(a, b) ? -1 : 1));

@@ -13,5 +13,6 @@ export const CATEGORY_MAP: CategoryMap = JSON.parse(readFileSync(CATEGORY_MAP_PA
 
 /** Типовите за категорија, или undefined ако категоријата уште не е прегледана. */
 export function typesFor(map: CategoryMap, chain: string, category: string): string[] | undefined {
-  return map[chain]?.[category];
+  const table = map[chain];
+  return table && Object.hasOwn(table, category) ? table[category] : undefined;
 }

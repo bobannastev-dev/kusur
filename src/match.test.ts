@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { compareBasket } from "./basket.ts";
 import { CATALOG } from "./catalog.ts";
-import type { CategoryMap } from "./category-map.ts";
+import type { TypeMaps } from "./type-maps.ts";
 import { parseList } from "./list.ts";
 import { cheapestPurchase, comparisonPrice } from "./match.ts";
 import type { Offer, SnapshotFile } from "./types.ts";
@@ -15,7 +15,7 @@ function store(label: string, offers: Offer[]): SnapshotFile {
   return { storeId: label, chain: label, label, city: "Велес", fetchedAt: "", updatedAt: null, offers };
 }
 
-const MAP: CategoryMap = { Р: { "ОРИЗ": ["oriz"] }, Ж: { "Ориз": ["oriz"] } };
+const MAP: TypeMaps = { products: {}, categories: { Р: { "ОРИЗ": ["oriz"] }, Ж: { "Ориз": ["oriz"] } } };
 const oriz = CATALOG.find((t) => t.id === "oriz")!;
 
 test("comparisonPrice: клуб-цена (ЛОЈАЛНОСТ) се споредува со редовната цена", () => {
@@ -51,4 +51,25 @@ test("кошничка: клуб-цената не го прави произв�
 
   const { single } = compareBasket([r, z], parseList("ориз").lines, 1, MAP);
   assert.deepEqual(single.map((p) => [p.stores[0].label, p.total]), [["Ж", 110], ["Р", 120]]);
+});
+
+test("синџир со мапа на производи: тип по име на производ, не по категорија", () => {
+  const kam = (name: string, price: number) => ({ ...offer(name, price, price, null, ""), description: "ОРИЗ" });
+  const k = store("К", [
+    kam("ОРИЗ БЕЛ ГЛАЗИРАН 1КГ", 100), // прегледан: ориз
+    kam("ОРИЗ ДОМАШЕН 1КГ", 60), // уште не е прегледан
+    kam("ОРИЗОВИ ГАЛЕТИ 1КГ", 50), // прегледан: не е дел од кошничка
+  ]);
+  const maps: TypeMaps = {
+    // Категоријата "" би го фатила секој производ — за К не смее да се гледа.
+    categories: { К: { "": ["oriz"] } },
+    products: { К: { "ОРИЗ БЕЛ ГЛАЗИРАН 1КГ": ["oriz"], "ОРИЗОВИ ГАЛЕТИ 1КГ": [] } },
+  };
+  assert.equal(cheapestPurchase(k, oriz, 1, maps)!.offer.name, "ОРИЗ БЕЛ ГЛАЗИРАН 1КГ");
+});
+
+test("правилата по име важат и за мапата на производи", () => {
+  const k = store("К", [offer("ОРИЗ ИНТЕГРАЛЕН 1КГ", 80, 80, null, "")]);
+  const maps: TypeMaps = { categories: {}, products: { К: { "ОРИЗ ИНТЕГРАЛЕН 1КГ": ["oriz"] } } };
+  assert.equal(cheapestPurchase(k, oriz, 1, maps), null);
 });

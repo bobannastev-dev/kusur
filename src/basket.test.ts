@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { compareBasket } from "./basket.ts";
-import type { CategoryMap } from "./category-map.ts";
+import type { TypeMaps } from "./type-maps.ts";
 import { parseList } from "./list.ts";
 import type { Offer, SnapshotFile } from "./types.ts";
 
@@ -30,10 +30,10 @@ const B = store("Б", [
   offer("СИРЕЊЕ ОВЧО РЕФУС", 250, "Млечни"),
 ]);
 
-const MAP: CategoryMap = {
+const MAP: TypeMaps = { products: {}, categories: {
   А: { "ТРАЈНО МЛЕКО": ["mleko"], "ЈАЈЦА": ["jajca"], "КРАВЈО СИРЕЊЕ": ["sirenje"], "ШЕЌЕР": ["seker"] },
   Б: { "Млеко ухт": ["mleko"], "Јајца": ["jajca"], "Млечни": ["sirenje", "sirenje-ovcho"] },
-};
+} };
 
 test("parseList: количини и непознати ставки", () => {
   const { lines, unknown } = parseList("млеко, 10 јајца, 2 млека, 300г сирење и авокадо");

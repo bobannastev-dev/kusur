@@ -4,6 +4,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { CATALOG, TYPES_BY_ID } from "./catalog.ts";
 import { CATEGORY_MAP } from "./category-map.ts";
+import { PRODUCT_MAP } from "./product-map.ts";
 
 const mapped = Object.entries(CATEGORY_MAP).flatMap(([chain, cats]) =>
   Object.entries(cats).map(([category, types]) => ({ chain, category, types })),
@@ -52,4 +53,14 @@ test("во мешана категорија најмногу еден тип н
       return catchAll.length > 1 ? [`${m.chain} :: ${m.category}: ${catchAll.join(", ")}`] : [];
     });
   assert.deepEqual(broken, []);
+});
+
+test("мапа на производи: типовите постојат, синџирот не е и во мапата на категории", () => {
+  const unknown = Object.entries(PRODUCT_MAP).flatMap(([chain, products]) =>
+    Object.entries(products).flatMap(([name, types]) =>
+      types.filter((id) => !TYPES_BY_ID.has(id)).map((id) => `${chain} :: ${name} → ${id}`),
+    ),
+  );
+  assert.deepEqual(unknown, []);
+  assert.deepEqual(Object.keys(PRODUCT_MAP).filter((chain) => Object.hasOwn(CATEGORY_MAP, chain)), []);
 });
