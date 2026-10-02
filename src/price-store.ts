@@ -29,6 +29,13 @@ export interface PriceStore {
   saveChanges(record: ChangesRecord): Promise<void>;
   /** Промените од `from` до `to` вклучително, по датум. */
   changesBetween(from: string, to: string): Promise<ChangesRecord[]>;
+  /** Ги брише промените со датум пред `beforeDate`; враќа колку записи. */
+  pruneChanges(beforeDate: string): Promise<number>;
+  /**
+   * Ги брише снимките со датум пред `beforeDate`, освен најновата снимка на секоја
+   * продавница (таа останува и ако е постара); враќа колку снимки.
+   */
+  pruneSnapshots(beforeDate: string): Promise<number>;
 }
 
 /** Колку производи недостигаат во снимката; null ако снимката е целосна или изворот не брои. */

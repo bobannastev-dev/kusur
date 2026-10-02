@@ -2,7 +2,7 @@
 //   <root>/snapshots/<YYYY-MM-DD>/<storeId>.json — ценовник
 //   <root>/changes/<YYYY-MM-DD>/<storeId>.json   — промени наспроти претходната снимка
 
-import { mkdir, readdir, readFile, rename, writeFile } from "node:fs/promises";
+import { mkdir, readdir, readFile, rename, rm, rmdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import type { ChangesRecord, PriceStore } from "./price-store.ts";
 import type { SnapshotFile } from "./types.ts";
@@ -34,6 +34,22 @@ async function writeJson(dir: string, name: string, value: unknown): Promise<voi
   const tmp = `${target}.${process.pid}.tmp`;
   await writeFile(tmp, JSON.stringify(value), "utf8");
   await rename(tmp, target);
+}
+
+/** Ги брише датотеките на датумите пред `beforeDate` што `keep` не ги задржува; празните папки исто. */
+async function pruneDated(dir: string, beforeDate: string, keep: (date: string, file: string) => boolean): Promise<number> {
+  let removed = 0;
+  for (const date of await dates(dir)) {
+    if (date >= beforeDate) break;
+    const dateDir = path.join(dir, date);
+    for (const file of await readdir(dateDir)) {
+      if (!file.endsWith(".json") || keep(date, file)) continue;
+      await rm(path.join(dateDir, file));
+      removed++;
+    }
+    if ((await readdir(dateDir)).length === 0) await rmdir(dateDir);
+  }
+  return removed;
 }
 
 export function createFilePriceStore(root: string = DATA_DIR): PriceStore {
@@ -77,6 +93,17 @@ export function createFilePriceStore(root: string = DATA_DIR): PriceStore {
         }
       }
       return records;
+    },
+
+    pruneChanges: (beforeDate) => pruneDated(changesDir, beforeDate, () => false),
+
+    async pruneSnapshots(beforeDate) {
+      // Најновата снимка на секоја продавница (по датум) — никогаш не се брише.
+      const newest = new Map<string, string>();
+      for (const date of await dates(snapshotsDir)) {
+        for (const file of await readdir(path.join(snapshotsDir, date))) if (file.endsWith(".json")) newest.set(file, date);
+      }
+      return pruneDated(snapshotsDir, beforeDate, (date, file) => newest.get(file) === date);
     },
   };
 }

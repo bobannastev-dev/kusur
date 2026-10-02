@@ -4,6 +4,7 @@
 
 import { runByHost } from "./fetch-plan.ts";
 import { isStale } from "./freshness.ts";
+import { addDays } from "./history.ts";
 import { REQUEST_DELAY_MS } from "./net.ts";
 import { recordFetch } from "./price-store.ts";
 import { createFilePriceStore } from "./price-store-file.ts";
@@ -17,6 +18,10 @@ if (stores.length === 0) {
 }
 
 const date = new Date().toLocaleDateString("sv-SE"); // локален датум како YYYY-MM-DD
+
+/** Рок на чување (SPEC-price-history.md): промени една година, целосни снимки една недела. */
+const KEEP_CHANGES_DAYS = 365;
+const KEEP_SNAPSHOTS_DAYS = 7;
 const priceStore = createFilePriceStore();
 const started = Date.now();
 const secondsSince = (t: number) => ((Date.now() - t) / 1000).toFixed(0);
@@ -57,4 +62,11 @@ const results = await runByHost(
 
 const failed = results.filter((r) => r.error).length;
 console.log(`\n${results.length - failed}/${results.length} продавници за ${secondsSince(started)} сек`);
+// По успешно преземање: старото надвор од рокот. Најновата снимка на секоја продавница
+// (и на онаа што денес паднала) останува секогаш.
+if (failed < results.length) {
+  const changes = await priceStore.pruneChanges(addDays(date, -KEEP_CHANGES_DAYS));
+  const snapshots = await priceStore.pruneSnapshots(addDays(date, -KEEP_SNAPSHOTS_DAYS));
+  if (changes || snapshots) console.log(`Избришано надвор од рокот: ${snapshots} снимки, ${changes} записи со промени`);
+}
 if (failed > 0) process.exit(1);

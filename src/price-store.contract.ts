@@ -121,4 +121,30 @@ export function priceStoreContract(name: string, makeStore: () => Promise<PriceS
     const recs = await store.changesBetween("2026-10-01", "2026-10-02");
     assert.deepEqual(recs.map((r) => r.date), ["2026-10-01", "2026-10-02"]);
   });
+
+  test(`${name}: бришење на стари промени — само постарите од рокот`, async () => {
+    const store = await makeStore();
+    for (const [date, price] of [["2026-09-28", 1], ["2026-09-29", 2], ["2026-09-30", 3], ["2026-10-01", 4]] as const) {
+      await recordFetch(store, date, snap("a", [offer("X", price)]));
+    }
+    assert.equal(await store.pruneChanges("2026-09-30"), 2);
+    const left = await store.changesBetween("2000-01-01", "2100-01-01");
+    assert.deepEqual(left.map((r) => r.date), ["2026-09-30", "2026-10-01"]);
+    assert.equal(await store.pruneChanges("2026-09-30"), 0);
+  });
+
+  test(`${name}: бришење на стари снимки — најновата на секоја продавница останува`, async () => {
+    const store = await makeStore();
+    await store.saveSnapshot("2026-09-01", snap("a", [offer("X", 1)]));
+    await store.saveSnapshot("2026-09-02", snap("a", [offer("X", 2)]));
+    await store.saveSnapshot("2026-10-01", snap("a", [offer("X", 3)]));
+    // Продавница „b" не е преземена од 02.09: нејзината единствена снимка мора да остане.
+    await store.saveSnapshot("2026-09-02", snap("b", [offer("Y", 5)]));
+
+    assert.equal(await store.pruneSnapshots("2026-09-25"), 2);
+    assert.equal((await store.latestSnapshot("a"))?.date, "2026-10-01");
+    assert.equal((await store.latestSnapshot("a", "2026-10-01")), null);
+    assert.equal((await store.latestSnapshot("b"))?.snapshot.offers[0].price, 5);
+    assert.equal(await store.pruneSnapshots("2026-09-25"), 0);
+  });
 }
