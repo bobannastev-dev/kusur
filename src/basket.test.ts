@@ -6,7 +6,7 @@ import { parseList } from "./list.ts";
 import type { Offer, SnapshotFile } from "./types.ts";
 
 function offer(name: string, price: number, category: string, unitPriceText = ""): Offer {
-  return { name, price, regularPrice: null, unitPriceText, category, description: "", promoUntil: null };
+  return { name, price, regularPrice: null, unitPriceText, category, description: "", promoKind: null, promoUntil: null };
 }
 
 function store(label: string, offers: Offer[]): SnapshotFile {

@@ -21,6 +21,7 @@ test("Жито: редови, датум на ажурирање, ред без 
     unitPriceText: "100ml = 8.20 ден.",
     category: "Млеко ухт",
     description: "",
+    promoKind: null,
     promoUntil: null,
   });
 });
@@ -31,6 +32,7 @@ test("Жито: ред со акција", () => {
   assert.equal(milkland.price, 44);
   assert.equal(milkland.regularPrice, 49);
   assert.equal(milkland.promoUntil, "25.09.2026 до 09.10.2026");
+  assert.equal(milkland.promoKind, "промотивна цена");
 });
 
 test("Стокомак: иста платформа, друг синџир", () => {
@@ -40,7 +42,7 @@ test("Стокомак: иста платформа, друг синџир", () 
   assert.equal(offers.length, 15);
   const limon = offers.find((o) => o.name === "ЛИМОН СВЕЖ КГР")!;
   assert.deepEqual(
-    [limon.price, limon.regularPrice, limon.unitPriceText, limon.category, limon.promoUntil],
-    [39, 79, "1кгр = 39.00 ден.", "СВЕЖО ОВОШЈЕ", "28.09.2026 до 04.10.2026"],
+    [limon.price, limon.regularPrice, limon.unitPriceText, limon.category, limon.promoKind, limon.promoUntil],
+    [39, 79, "1кгр = 39.00 ден.", "СВЕЖО ОВОШЈЕ", "акциска цена", "28.09.2026 до 04.10.2026"],
   );
 });

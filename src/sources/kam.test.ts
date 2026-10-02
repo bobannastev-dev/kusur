@@ -22,6 +22,7 @@ test("КАМ: ред со акција", async () => {
   assert.equal(dora.regularPrice, 129);
   assert.equal(dora.unitPriceText, "100 гр = 31.42 ден.");
   assert.equal(dora.description, "MIDI ТОРТИЧКИ СО ЧОКОЛАДЕН КРЕМ");
+  assert.equal(dora.promoKind, "промотивна цена");
   assert.match(dora.promoUntil ?? "", /28\.09\.2026 до 04\.10\.2026/);
 });
 
@@ -35,6 +36,7 @@ test("КАМ: ред без акција, опис во повеќе линии"
     unitPriceText: "100 гр = 16.66 ден.",
     category: "",
     description: "TONUS ЛЕБ СТАНДАРД ОД ИЗРТЕНО ЗРНО",
+    promoKind: null,
     promoUntil: null,
   });
 });

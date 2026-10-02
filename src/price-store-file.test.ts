@@ -14,7 +14,7 @@ test("датотеки: презапишување преку привремен
   const store = createFilePriceStore(root);
   const snap = (price: number) => ({
     storeId: "a", chain: "Т", label: "a", city: "Велес", fetchedAt: "", updatedAt: null,
-    offers: [{ name: "X", price, regularPrice: null, unitPriceText: "", category: "", description: "", promoUntil: null }],
+    offers: [{ name: "X", price, regularPrice: null, unitPriceText: "", category: "", description: "", promoKind: null, promoUntil: null }],
   });
   await store.saveSnapshot("2026-10-02", snap(1));
   await store.saveSnapshot("2026-10-02", snap(2));

@@ -19,6 +19,7 @@ test("Рамстор: редови и датум на ажурирање", () =>
     unitPriceText: "100 ГР: =16.11ДЕН",
     category: "ОРИЗ",
     description: "",
+    promoKind: null,
     promoUntil: null,
   });
 });
@@ -26,7 +27,16 @@ test("Рамстор: редови и датум на ажурирање", () =>
 test("Рамстор: ред со акција", () => {
   const { offers } = parseRamstorePage(html);
   const rizo = offers.find((o) => o.name === "РИСО СКОТИ ОРИЗ ПАРБОИЛД 1 КГ")!;
-  assert.deepEqual([rizo.price, rizo.regularPrice, rizo.promoUntil], [179, 255, "01.10.2026 - 21.10.2026"]);
+  assert.deepEqual(
+    [rizo.price, rizo.regularPrice, rizo.promoKind, rizo.promoUntil],
+    [179, 255, "АКЦИСКА ПРОДАЖБА", "01.10.2026 - 21.10.2026"],
+  );
+});
+
+test("Рамстор: клуб-цена (ЛОЈАЛНОСТ): продажната е со картичка, редовната без", () => {
+  const { offers } = parseRamstorePage(html);
+  const benlian = offers.find((o) => o.name === "БЕНЛИАН РАЈС КЕЈК СО ЛЕН И СОНЧОГЛЕД 100 ГР")!;
+  assert.deepEqual([benlian.price, benlian.regularPrice, benlian.promoKind], [45, 55, "ЛОЈАЛНОСТ"]);
 });
 
 test("Рамстор: празна табела е грешка, не празен ценовник", () => {

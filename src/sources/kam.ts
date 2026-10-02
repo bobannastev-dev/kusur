@@ -117,6 +117,7 @@ function parsePage(items: TextItem[]): { offers: Offer[]; rowCount: number; text
       unitPriceText: cell("unitPrice"),
       category: "",
       description: cell("description"),
+      promoKind: cell("promoKind") || null,
       promoUntil: cell("promoUntil") || null,
     });
   }

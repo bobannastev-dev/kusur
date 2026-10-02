@@ -4,7 +4,7 @@ import { diffOffers } from "./changes.ts";
 import type { Offer } from "./types.ts";
 
 const offer = (name: string, price: number, regularPrice: number | null = null): Offer => ({
-  name, price, regularPrice, unitPriceText: "", category: "", description: "", promoUntil: null,
+  name, price, regularPrice, unitPriceText: "", category: "", description: "", promoKind: null, promoUntil: null,
 });
 
 test("нови, исчезнати и променети цени", () => {

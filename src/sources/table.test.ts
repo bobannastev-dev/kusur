@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { rowToOffer, type ColumnMap } from "./table.ts";
 
-const COLS: ColumnMap = { name: 0, price: 1, unitPrice: 2, category: 3, availability: 4, regularPrice: 5, promoUntil: 8 };
+const COLS: ColumnMap = { name: 0, price: 1, unitPrice: 2, category: 3, availability: 4, regularPrice: 5, promoKind: 7, promoUntil: 8 };
 
 test("производ што го нема во продавницата не влегува", () => {
   assert.equal(rowToOffer(["ЛЕБ", "35 ден.", "", "ЛЕБОВИ", "Не", "35 ден."], COLS), null);

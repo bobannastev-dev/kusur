@@ -7,7 +7,7 @@ import { loadCurrentSnapshots, recordFetch, type PriceStore } from "./price-stor
 import type { Offer, SnapshotFile } from "./types.ts";
 
 const offer = (name: string, price: number): Offer => ({
-  name, price, regularPrice: null, unitPriceText: "", category: "", description: "", promoUntil: null,
+  name, price, regularPrice: null, unitPriceText: "", category: "", description: "", promoKind: null, promoUntil: null,
 });
 
 const snap = (storeId: string, offers: Offer[], completeness?: SnapshotFile["completeness"]): SnapshotFile => ({

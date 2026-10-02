@@ -22,6 +22,7 @@ const COLUMNS: ColumnMap = {
   category: 3,
   availability: 4,
   regularPrice: 5,
+  promoKind: 7,
   promoUntil: 8,
 };
 

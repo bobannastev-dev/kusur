@@ -4,7 +4,7 @@ import type { Offer } from "../types.ts";
 import { collectUntilComplete } from "./passes.ts";
 
 const o = (name: string, price = 10): Offer => ({
-  name, price, regularPrice: null, unitPriceText: "", category: "", description: "", promoUntil: null,
+  name, price, regularPrice: null, unitPriceText: "", category: "", description: "", promoKind: null, promoUntil: null,
 });
 
 /** Поминувања што секој пат враќаат дел од производите (како Жито). */
