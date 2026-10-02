@@ -40,6 +40,17 @@ function missingCount(s: SnapshotFile): number | null {
   return missing > 0 ? missing : null;
 }
 
+/**
+ * Најновите снимки само за продавниците што се уште во регистарот
+ * (стари снимки од изоставени продавници остануваат, но не се користат).
+ */
+export async function loadCurrentSnapshots(store: PriceStore, storeIds: Set<string>) {
+  const latest = (await store.latestSnapshots()).filter((l) => storeIds.has(l.snapshot.storeId));
+  if (latest.length === 0) throw new Error("Нема преземени ценовници. Прво пушти: npm run fetch");
+  const dates = [...new Set(latest.map((l) => l.date))].sort();
+  return { snapshots: latest.map((l) => l.snapshot), dates };
+}
+
 const MIN_OF_EXPECTED = 0.9;
 const MIN_OF_PREVIOUS = 0.7;
 

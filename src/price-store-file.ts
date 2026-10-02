@@ -36,17 +36,6 @@ async function writeJson(dir: string, name: string, value: unknown): Promise<voi
   await rename(tmp, target);
 }
 
-/**
- * Најновите снимки само за продавниците што се уште во регистарот
- * (стари снимки од изоставени продавници остануваат на диск, но не се користат).
- */
-export async function loadCurrentSnapshots(storeIds: Set<string>, store: PriceStore = createFilePriceStore()) {
-  const latest = (await store.latestSnapshots()).filter((l) => storeIds.has(l.snapshot.storeId));
-  if (latest.length === 0) throw new Error("Нема преземени ценовници. Прво пушти: npm run fetch");
-  const dates = [...new Set(latest.map((l) => l.date))].sort();
-  return { snapshots: latest.map((l) => l.snapshot), dates };
-}
-
 export function createFilePriceStore(root: string = DATA_DIR): PriceStore {
   const snapshotsDir = path.join(root, "snapshots");
   const changesDir = path.join(root, "changes");

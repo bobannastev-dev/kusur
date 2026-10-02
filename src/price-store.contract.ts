@@ -3,7 +3,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { recordFetch, type PriceStore } from "./price-store.ts";
+import { loadCurrentSnapshots, recordFetch, type PriceStore } from "./price-store.ts";
 import type { Offer, SnapshotFile } from "./types.ts";
 
 const offer = (name: string, price: number): Offer => ({
@@ -99,6 +99,18 @@ export function priceStoreContract(name: string, makeStore: () => Promise<PriceS
 
     // Нормално намалување (95 од 100) е во ред.
     await recordFetch(store, "2026-10-03", snap("a", full.slice(0, 95)));
+  });
+
+  test(`${name}: тековни снимки само за продавниците од регистарот`, async () => {
+    const store = await makeStore();
+    await store.saveSnapshot("2026-10-01", snap("a", [offer("X", 1)]));
+    await store.saveSnapshot("2026-10-02", snap("b", [offer("Y", 2)]));
+    await store.saveSnapshot("2026-10-02", snap("стара", [offer("Z", 3)]));
+
+    const { snapshots, dates } = await loadCurrentSnapshots(store, new Set(["a", "b"]));
+    assert.deepEqual(snapshots.map((s) => s.storeId).sort(), ["a", "b"]);
+    assert.deepEqual(dates, ["2026-10-01", "2026-10-02"]);
+    await assert.rejects(loadCurrentSnapshots(store, new Set(["нема"])), /npm run fetch/);
   });
 
   test(`${name}: промени по период`, async () => {

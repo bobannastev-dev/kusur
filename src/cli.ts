@@ -5,7 +5,8 @@
 import { compareBasket, type Plan } from "./basket.ts";
 import { CATALOG } from "./catalog.ts";
 import { parseList } from "./list.ts";
-import { loadCurrentSnapshots } from "./price-store-file.ts";
+import { loadCurrentSnapshots } from "./price-store.ts";
+import { createFilePriceStore } from "./price-store-file.ts";
 import { STORES } from "./stores.ts";
 import type { Unit } from "./types.ts";
 
@@ -50,7 +51,7 @@ function printPlan(plan: Plan, showStore: boolean) {
   }
 }
 
-const { snapshots, dates } = await loadCurrentSnapshots(new Set(STORES.map((s) => s.id)));
+const { snapshots, dates } = await loadCurrentSnapshots(createFilePriceStore(), new Set(STORES.map((s) => s.id)));
 const { lines, unknown } = parseList(input);
 
 if (lines.length === 0) {
