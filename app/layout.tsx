@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Onest, Unbounded } from "next/font/google";
 import type { ReactNode } from "react";
 import { BottomNav } from "./components/BottomNav.tsx";
+import { ServiceWorker } from "./components/ServiceWorker.tsx";
 import { PriceDataProvider } from "./lib/data.tsx";
 import "./globals.css";
 
@@ -12,6 +13,8 @@ const display = Unbounded({ subsets: ["cyrillic", "latin"], weight: ["500", "600
 export const metadata: Metadata = {
   title: "Каде поевтино?",
   description: "Каде е најевтина целата кошничка во Велес — цени од маркетите секој ден.",
+  icons: { icon: "/icon-192.png", apple: "/apple-icon.png" },
+  appleWebApp: { capable: true, title: "Поевтино", statusBarStyle: "default" },
 };
 
 export const viewport: Viewport = {
@@ -31,6 +34,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <PriceDataProvider>
           {children}
           <BottomNav />
+          <ServiceWorker />
         </PriceDataProvider>
       </body>
     </html>

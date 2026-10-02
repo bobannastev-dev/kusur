@@ -1,0 +1,48 @@
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.store {
+  border-radius: 18px;
+  padding: 14px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.name {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.meta {
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.updated {
+  text-align: right;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.updated strong {
+  color: var(--ink);
+}
+
+.stale {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.note {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
