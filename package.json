@@ -13,7 +13,8 @@
     "test": "node --test \"src/**/*.test.ts\"",
     "categories": "node src/categories.ts",
     "typecheck": "tsc -p .",
-    "stores": "node src/stores-cli.ts"
+    "stores": "node src/stores-cli.ts",
+    "propose": "node src/propose-cli.ts"
   },
   "dependencies": {
     "cheerio": "^1.0.0",

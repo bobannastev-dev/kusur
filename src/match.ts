@@ -3,7 +3,7 @@
 
 import type { ProductType } from "./catalog.ts";
 import { parseQuantity, parseUnitPrice } from "./parse.ts";
-import { reviewedTypes, TYPE_MAPS, type TypeMaps } from "./type-maps.ts";
+import { mapsByProduct, reviewedTypes, TYPE_MAPS, type TypeMaps } from "./type-maps.ts";
 import type { Offer, SnapshotFile } from "./types.ts";
 
 /** Пакување од 900г се смета дека покрива потреба од 1кг (исто 905мл масло за 1л). */
@@ -72,14 +72,26 @@ function resolvePack(offer: Offer, type: ProductType): Pick<Candidate, "packAmou
   return null;
 }
 
+/**
+ * Правилата по име на типот: `require` во `name`, `exclude` ни во `name` ни во `context`.
+ * Кај синџир без категории (КАМ) „име" е името и описот, бидејќи името е скратено
+ * („ЧОКОЛ.МЛЕЧНО АЛПИКО 100ГР"), а описот го носи видот („ALPIKO ЧОКОЛАДО МЛЕЧНО").
+ */
+export function passesNameRules(type: ProductType, name: string, context = ""): boolean {
+  if (type.require && !type.require.test(name)) return false;
+  if (type.exclude?.test(`${name} | ${context}`)) return false;
+  return true;
+}
+
+/** Текстот врз кој се проверуваат правилата по име. */
+export function ruleText(offer: Offer, byProduct: boolean): string {
+  return (byProduct ? `${offer.name} | ${offer.description}` : offer.name).toUpperCase();
+}
+
 /** Дали редот од ценовникот е од дадениот тип (без да се гледа количината). */
 export function matchesType(offer: Offer, chain: string, type: ProductType, maps: TypeMaps = TYPE_MAPS): boolean {
   if (!reviewedTypes(maps, chain, offer)?.includes(type.id)) return false;
-
-  const name = offer.name.toUpperCase();
-  if (type.require && !type.require.test(name)) return false;
-  if (type.exclude?.test(`${name} | ${offer.category.toUpperCase()}`)) return false;
-  return true;
+  return passesNameRules(type, ruleText(offer, mapsByProduct(maps, chain)), offer.category.toUpperCase());
 }
 
 export function findCandidates(store: SnapshotFile, type: ProductType, maps: TypeMaps = TYPE_MAPS): Candidate[] {

@@ -44,7 +44,7 @@ export const CATALOG: ProductType[] = [
   { id: "kiselo-mleko", label: "Кисело млеко (кравјо)", aliases: ["кисело млеко"], unit: "kg", equivalentUnits: ["l"], defaultAmount: 0.4, require: /КИСЕЛ/, exclude: /КОЗЈ[ОИ]|ОВЧ(О|КО)|ПАВЛАК/ },
   {
     id: "jogurt", label: "Јогурт (обичен)", aliases: ["јогурт"], unit: "kg", equivalentUnits: ["l"], defaultAmount: 1, require: /ЈОГУРТ/,
-    exclude: /ГРЧКИ|ОВОШ|ПРОТЕИН|БЕЗ ЛАКТОЗА|ПРОБИОТ|БАЛАНС|КОЗЈ|ОВЧ|АКТИВИА|ЦАЦИКИ|ЈАГОД|ВИШН|ШУМСК|БАНАН|ДЕСЕРТ|СПИТИКО|СКИР/,
+    exclude: /ГРЧКИ|ОВОШ|ПРОТЕИН|БЕЗ ЛАКТОЗА|ПРОБИОТ|БАЛАНС|КОЗЈ(?!АК)|ОВЧ|АКТИВИА|ЦАЦИКИ|ЈАГОД|ВИШН|ШУМСК|БАНАН|ДЕСЕРТ|СПИТИКО|СКИР/,
   },
   { id: "grcki-jogurt", label: "Грчки јогурт", aliases: ["грчки јогурт"], unit: "kg", defaultAmount: 0.15, require: /ГРЧКИ/, exclude: /ЈАГОД|ШУМСК|ОВОШ|ВКУС|ЦАЦИКИ|ВИШН|МАЛИН|БОРОВ|ПРАСК|МЕД|МАНГО|БАНАН|КАЈСИ|ПРОТЕИН/ },
   { id: "ovoshen-jogurt", label: "Овошен јогурт", aliases: ["овошен јогурт"], unit: "kg", defaultAmount: 0.15, exclude: /ПРОТЕИН/ },
@@ -102,7 +102,7 @@ export const CATALOG: ProductType[] = [
   { id: "pileshko-file", label: "Пилешко филе / стек", aliases: ["пилешко филе", "пилешки стек", "филе"], unit: "kg", defaultAmount: 0.5, byWeight: true, require: /ФИЛЕ|СТЕК|ГРАДИ/, exclude: /ПАНИР|ЧАДЕН|ПОХОВ|МИНИ|ГИРО/ },
   { id: "pileshki-kopan", label: "Пилешки копан", aliases: ["копан", "копани", "пилешки копан", "батак"], unit: "kg", defaultAmount: 1, byWeight: true, require: /КОПАН/ },
   { id: "pileshki-krilca", label: "Пилешки крилца", aliases: ["крилца", "пилешки крилца"], unit: "kg", defaultAmount: 1, byWeight: true, require: /КРИЛЦ/, exclude: /ПЕЧЕН|ПАНИР/ },
-  { id: "pileshki-dzhiger", label: "Пилешки џигер", aliases: ["џигер", "пилешки џигер"], unit: "kg", defaultAmount: 0.5, byWeight: true, require: /ЏИГЕР/ },
+  { id: "pileshki-dzhiger", label: "Пилешки џигер", aliases: ["џигер", "пилешки џигер"], unit: "kg", defaultAmount: 0.5, byWeight: true, require: /ЏИГЕР|ЦРН ДРОБ/ },
   { id: "svinsko-meso", label: "Свинско месо", aliases: ["свинско месо", "свинско", "свински бут", "каре"], unit: "kg", defaultAmount: 1, byWeight: true, require: /СВИНСК|КАРЕ|КРЕМЕНДАЛ/, exclude: /ЧАДЕН|ШКЕМБЕ|МЕЛЕН|СЛАНИН|ПОЛУТК/ },
   { id: "meleno-meso", label: "Мелено месо", aliases: ["мелено месо", "мелено"], unit: "kg", defaultAmount: 0.5, require: /МЕЛЕН/ },
   { id: "cebapi", label: "Ќебапи", aliases: ["ќебапи", "ќебапчиња"], unit: "kg", defaultAmount: 0.45, require: /ЌЕБАП|ЌЕВАП/ },
@@ -195,7 +195,7 @@ export const CATALOG: ProductType[] = [
   {
     id: "kafe", label: "Кафе (турско, мелено)", aliases: ["кафе", "турско кафе", "мелено кафе"], unit: "kg", defaultAmount: 0.2,
     require: /КАФЕ|РИО|БРАВО|МЕРАК|ЕФЕНДИ|ХОРИЗОНТ|ГРАНД/,
-    exclude: /ИНСТАНТ|ФРАПЕ|КАПСУЛ|ЕСПРЕСО|НЕСКАФЕ|КАПУЧИНО|\d ?ВО ?\d|МАКИЈАТО|ФИЛТЕР|ЛАВАЦА|ЗРНО|ОБЕЛУВАЧ|ДОЛЧЕ|ЛУНГО|ИЗИ|ГОЛД|МЕЛИТА|ЈАКОБС|ЧИБО/,
+    exclude: /ИНСТАНТ|ФРАПЕ|КАПСУЛ|ЕСПРЕСО|НЕСКАФЕ|КАПУЧИНО|\d ?ВО ?\d|МАКИЈАТО|ФИЛТЕР|ЛАВАЦА|ЗРНО|ОБЕЛУВАЧ|ДОЛЧЕ|ЛУНГО|ИЗИ|(?<!ГРАНД )ГОЛД|МЕЛИТА|ЈАКОБС|ЧИБО/,
   },
   { id: "instant-kafe", label: "Инстант кафе", aliases: ["нескафе", "инстант кафе"], unit: "kg", defaultAmount: 0.1, require: /НЕСКАФЕ|ИНСТАНТ|ГОЛД|ЈАКОБС/, exclude: /ЛАДНО|АЈС|\d ?ВО ?\d|КАПУЧИНО|ЛАТЕ|МАКИЈАТО|ФРАПЕ|ВКУС|КАПС/ },
   { id: "chaj", label: "Чај", aliases: ["чај", "чаеви"], unit: "kg", defaultAmount: 0.03, exclude: /ЛЕДЕН|ЛАДЕН|МАЧА/ },

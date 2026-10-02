@@ -4,3 +4,4 @@ data/changes/
 .env
 .env.*
 !.env.example
+data/review/
