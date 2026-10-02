@@ -11,10 +11,10 @@ const text = Onest({ subsets: ["cyrillic", "latin"], variable: "--font-text", di
 const display = Unbounded({ subsets: ["cyrillic", "latin"], weight: ["500", "600", "700"], variable: "--font-display", display: "swap" });
 
 export const metadata: Metadata = {
-  title: "Каде поевтино?",
+  title: "Кусур — каде е поевтино",
   description: "Каде е најевтина целата кошничка во Велес — цени од маркетите секој ден.",
   icons: { icon: "/icon-192.png", apple: "/apple-icon.png" },
-  appleWebApp: { capable: true, title: "Поевтино", statusBarStyle: "default" },
+  appleWebApp: { capable: true, title: "Кусур", statusBarStyle: "default" },
 };
 
 export const viewport: Viewport = {

@@ -6,8 +6,8 @@ export const dynamic = "force-static";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Каде поевтино?",
-    short_name: "Поевтино",
+    name: "Кусур — каде е поевтино",
+    short_name: "Кусур",
     description: "Каде е најевтина целата кошничка во Велес — цени од маркетите секој ден.",
     lang: "mk",
     start_url: "/",

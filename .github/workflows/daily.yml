@@ -1,0 +1,56 @@
+# Секое утро: ги презема цените, ги чува податоците и го објавува Кусур на kusur.online.
+# Маркетите мора да ги објават цените до 10 часот; ова тргнува во 10:30 во Велес.
+
+name: Дневни цени
+
+on:
+  schedule:
+    - cron: "30 8 * * *" # 08:30 UTC = 10:30 во Велес (лето); 09:30 во зима
+  workflow_dispatch:
+
+concurrency:
+  group: daily
+  cancel-in-progress: false
+
+permissions:
+  contents: write # архивата на податоците во GitHub Release
+
+jobs:
+  daily:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    env:
+      TZ: Europe/Skopje # датумот на снимката е по македонско време
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Тестови
+        run: npm test
+
+      - name: Враќање на податоците од претходниот ден
+        run: bash scripts/data-archive.sh restore
+
+      - name: Преземање на цените
+        # Паднат маркет не ја спречува објавата: останува неговата претходна снимка.
+        run: npm run fetch || echo "::warning::Некои продавници не се преземени — види го логот погоре."
+
+      - name: Зачувување на податоците
+        run: bash scripts/data-archive.sh publish
+
+      - name: Build (пакет со цени + апликација)
+        run: npm run build
+
+      - name: Објава на Vercel
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: npx --yes vercel@61 deploy out --prod --yes --token "$VERCEL_TOKEN"

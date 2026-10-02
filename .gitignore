@@ -9,3 +9,6 @@ public/data/
 .next/
 out/
 *.tsbuildinfo
+.vercel/
+data.tar.gz
+data-*.tar.gz
