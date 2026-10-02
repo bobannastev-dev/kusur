@@ -36,8 +36,10 @@ export async function collectUntilComplete(runPass: () => Promise<Pass>, maxPass
     const before = byName.size;
     for (const offer of pass.offers) if (!byName.has(offer.name)) byName.set(offer.name, offer);
 
-    if (byName.size >= expected) break; // сè е собрано
-    if (passes >= 2 && byName.size === before) break; // ново поминување не донело ништо
+    // expected = 0: изворот не го објавил бројот (или е сменет текстот) — тогаш не
+    // знаеме кога е „сè", па се прават сите поминувања.
+    if (expected > 0 && byName.size >= expected) break; // сè е собрано
+    if (expected > 0 && passes >= 2 && byName.size === before) break; // ново поминување не донело ништо
   }
 
   return { offers: [...byName.values()], updatedAt, expected, passes };

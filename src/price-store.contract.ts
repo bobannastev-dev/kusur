@@ -58,11 +58,47 @@ export function priceStoreContract(name: string, makeStore: () => Promise<PriceS
 
   test(`${name}: нецелосна снимка не создава „исчезнати"`, async () => {
     const store = await makeStore();
-    await recordFetch(store, "2026-10-01", snap("z", [offer("A", 1), offer("B", 2), offer("C", 3)], { expected: 3, passes: 1 }));
-    const r = await recordFetch(store, "2026-10-02", snap("z", [offer("A", 1), offer("C", 4)], { expected: 3, passes: 3 }));
+    // Како Жито: 19 од 20 објавени — еден производ случајно не стигнал.
+    const all = Array.from({ length: 20 }, (_, i) => offer(`P${i}`, 10));
+    await recordFetch(store, "2026-10-01", snap("z", all, { expected: 20, passes: 1 }));
+    // P0 не стигнал, P19 поскапел.
+    const next = [...all.slice(1, 19), offer("P19", 12)];
+    const r = await recordFetch(store, "2026-10-02", snap("z", next, { expected: 20, passes: 3 }));
     assert.deepEqual(r.removed, []);
-    assert.deepEqual(r.changed.map((c) => c.name), ["C"]);
+    assert.deepEqual(r.changed.map((c) => c.name), ["P19"]);
     assert.match(r.notes.join(" "), /нецелосна/);
+  });
+
+  test(`${name}: непознат број на производи значи нецелосна снимка`, async () => {
+    const store = await makeStore();
+    await recordFetch(store, "2026-10-01", snap("z", [offer("A", 1), offer("B", 2)], { expected: 0, passes: 3 }));
+    const r = await recordFetch(store, "2026-10-02", snap("z", [offer("A", 1), offer("C", 3)], { expected: 0, passes: 3 }));
+    assert.deepEqual(r.removed, []);
+  });
+
+  test(`${name}: празен или скратен ценовник не ја заменува претходната снимка`, async () => {
+    const store = await makeStore();
+    const full = Array.from({ length: 100 }, (_, i) => offer(`P${i}`, i + 1));
+    await recordFetch(store, "2026-10-01", snap("a", full));
+
+    await assert.rejects(recordFetch(store, "2026-10-02", snap("a", [])), /празен/);
+    // Под 70% од претходната снимка (кога изворот не објавува вкупен број).
+    await assert.rejects(recordFetch(store, "2026-10-02", snap("a", full.slice(0, 60))), /скратен/);
+    // Под 90% од бројот што го објавува изворот.
+    await assert.rejects(
+      recordFetch(store, "2026-10-02", snap("a", full.slice(0, 85), { expected: 100, passes: 3 })),
+      /скратен/,
+    );
+    assert.equal((await store.latestSnapshot("a"))?.date, "2026-10-01");
+    assert.deepEqual(await store.changesBetween("2026-10-02", "2026-10-02"), []);
+
+    // Повторно преземање во ист ден што е скратено не ја брише добрата снимка од тој ден.
+    await recordFetch(store, "2026-10-02", snap("a", full));
+    await assert.rejects(recordFetch(store, "2026-10-02", snap("a", full.slice(0, 50))), /скратен/);
+    assert.equal((await store.latestSnapshot("a"))?.snapshot.offers.length, 100);
+
+    // Нормално намалување (95 од 100) е во ред.
+    await recordFetch(store, "2026-10-03", snap("a", full.slice(0, 95)));
   });
 
   test(`${name}: промени по период`, async () => {

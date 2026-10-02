@@ -28,8 +28,6 @@ const results = await runByHost(
     const t = Date.now();
     try {
       const { updatedAt, offers, completeness } = await store.fetchOffers();
-      // Празен ценовник не смее да ги замени вчерашните цени со „ништо".
-      if (offers.length === 0) throw new Error("празен ценовник");
       const fetchedAt = new Date().toISOString();
       const changes = await recordFetch(priceStore, date, {
         storeId: store.id,

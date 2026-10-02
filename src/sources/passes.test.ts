@@ -47,3 +47,11 @@ test("ценовникот е од првото поминување, новит
   assert.deepEqual(r.offers.map((x) => [x.name, x.price]), [["A", 10], ["B", 20], ["C", 30]]);
   assert.equal(r.updatedAt, "x");
 });
+
+test("непознат број на производи (0): секогаш сите поминувања", async () => {
+  // Ако „од N артикли" не се прочита, бројот е 0 — тоа е „непознато", не „сè е собрано".
+  const r = await collectUntilComplete(fakePasses([["A"], ["A", "B"], ["A", "B", "C"]], 0), 3);
+  assert.equal(r.passes, 3);
+  assert.deepEqual(r.offers.map((x) => x.name), ["A", "B", "C"]);
+  assert.equal(r.expected, 0);
+});
