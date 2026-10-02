@@ -28,9 +28,10 @@
   - Обем: M (податоци)
 
 - [ ] **Задача 3: Ниво на ставката и замена**
-  - Опис: `BasketLine.option`; `pickFor(line, candidates)` → купување со `match` (`exact` | `brand` | `any`) и `reason` („нема Nescafé", „нема Nescafé 200 г"); `compareBasketWith` го користи; `Plan` брои замени.
+  - Опис: `BasketLine.option`; `pickFor(line, candidates)` → купување со `match` (`exact` | `brand` | `any`) и `reason` („нема Nescafé", „нема Nescafé 200 г"); `exact` = бренд + грамажа ±3% + карактеристичните зборови од името на избраниот производ (`productKey`); `compareBasketWith` го користи; `Plan` брои замени.
   - Прифаќање:
     - Тест (синтетички): exact → brand → any по ред; без опција — исто како денес.
+    - Тест: „НЕСКАФЕ ГОЛД 200ГР" не е ист производ со „НЕСКАФЕ КЛАСИК 200ГР"; „КЛАСИК" = „CLASSIC".
     - Тест (вистински пакет): Nescafé Classic 200 г → Жито 419 / КАМ 435 / Рамстор 435, Стокомак замена (бренд, друга грамажа).
     - Тест (вистински пакет): Персил 3 кг → Стокомак замена (нема Персил прашок).
   - Проверка: `npm test`
@@ -71,14 +72,22 @@
   - Фајлови: `app/lib/basket.ts`, `app/components/ItemSheet.tsx`, `app/components/BasketResult.tsx`, `app/prebaraj/page.tsx`, `app/components/AddSheet.tsx`
   - Обем: L
 
-- [ ] **Задача 7: Објава**
+- [ ] **Задача 7: Извештај во дневниот workflow**
+  - Опис: `npm run report` (непрегледани категории/производи, покриеност на брендовите по тип) — краток излез; чекор во `daily.yml` по преземањето, без да ја спречи објавата.
+  - Прифаќање: критериум 9 од spec-от.
+  - Проверка: `npm run report`; рачно пуштање на workflow-от
+  - Зависи од: 1
+  - Фајлови: `src/report-cli.ts`, `package.json`, `.github/workflows/daily.yml`
+  - Обем: S
+
+- [ ] **Задача 8: Објава**
   - Опис: build со најновите податоци, објава на kusur.online; workflow-от ја зема новата верзија од следното утро.
   - Проверка: kusur.online на телефон
-  - Зависи од: 6
+  - Зависи од: 6, 7
   - Обем: S
 
 ### Checkpoint B (модулот готов)
-- [ ] Сите 8 критериуми од `SPEC-item-options.md`
+- [ ] Сите 9 критериуми од `SPEC-item-options.md`
 - [ ] `/review` (посебен агент) — item-options и отворениот Checkpoint C на web-app
 - [ ] Spec-ови ажурирани
 - [ ] Белешката во Second Brain ажурирана
