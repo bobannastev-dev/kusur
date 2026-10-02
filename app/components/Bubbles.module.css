@@ -1,0 +1,52 @@
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 8px 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.bubble {
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--glass-strong);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.bubble:active {
+  transform: scale(0.96);
+}
+
+.name {
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 1.15;
+}
+
+.amount {
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.add {
+  width: 60px;
+  height: 60px;
+  background: transparent;
+  border: 1.5px dashed var(--ink-soft);
+  color: var(--ink-soft);
+  font-size: 26px;
+  backdrop-filter: none;
+}

@@ -1,0 +1,171 @@
+.hero {
+  border-radius: 28px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+}
+
+.total {
+  font: 600 54px/1 var(--font-display), sans-serif;
+  letter-spacing: -0.02em;
+}
+
+.total span {
+  font-size: 22px;
+  font-weight: 500;
+}
+
+.store {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.saving {
+  margin-top: 8px;
+  background: var(--good-bg);
+  color: var(--good);
+  border-radius: 999px;
+  padding: 7px 12px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.missing {
+  font-size: 13px;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.two {
+  border-radius: 22px;
+  padding: 16px 18px;
+}
+
+.two summary {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.two summary::-webkit-details-marker {
+  display: none;
+}
+
+.two strong {
+  display: block;
+  font-size: 15px;
+}
+
+.twoIcon {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.twoSub {
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.stores {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.storesHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.storesHead h2 {
+  margin: 0;
+  font: 600 17px/1.2 var(--font-display), sans-serif;
+}
+
+.storesHead span {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.row {
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.rowButton {
+  width: 100%;
+  padding: 12px 14px;
+  border: 0;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.rowHead {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.bar {
+  display: block;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--line);
+  overflow: hidden;
+}
+
+.bar span {
+  display: block;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--bar);
+}
+
+.bar .best {
+  background: var(--bar-best);
+}
+
+.items {
+  list-style: none;
+  margin: 0;
+  padding: 4px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.itemHead {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 14px;
+}
+
+.itemSub {
+  font-size: 12.5px;
+  color: var(--ink-soft);
+}
