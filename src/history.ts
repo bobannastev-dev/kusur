@@ -2,6 +2,7 @@
 // кој било ден. Чисти функции — читањето од PriceStore е во командите.
 
 import type { ProductType } from "./catalog.ts";
+import { addDays } from "./dates.ts";
 import { comparisonPrice, findCandidates, type Candidate } from "./match.ts";
 import type { ChangesRecord } from "./price-store.ts";
 import { TYPE_MAPS, type TypeMaps } from "./type-maps.ts";
@@ -216,12 +217,6 @@ export interface PromoCheck {
   lowestBefore: number | null;
   /** Акцијата важи само со клуб-картичка. */
   loyalty: boolean;
-}
-
-export function addDays(date: string, days: number): string {
-  const d = new Date(`${date}T00:00:00Z`);
-  d.setUTCDate(d.getUTCDate() + days);
-  return d.toISOString().slice(0, 10);
 }
 
 /** Почетокот на последниот непрекинат период со дадената цена. */

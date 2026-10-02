@@ -4,7 +4,7 @@
 import { CATALOG } from "./catalog.ts";
 import { allSeries, dropsSince, historyStart, promoCheck, PROMO_VERDICT_TEXT, DROP_THRESHOLD } from "./history.ts";
 import { parseList } from "./list.ts";
-import { loadHistories } from "./price-store.ts";
+import { loadHistories } from "./history-load.ts";
 import { createFilePriceStore } from "./price-store-file.ts";
 import { STORES } from "./stores.ts";
 import type { Unit } from "./types.ts";

@@ -3,7 +3,6 @@
 // (price-store.contract.ts).
 
 import { diffOffers, type PriceChange } from "./changes.ts";
-import type { StoreHistory } from "./history.ts";
 import type { Offer, SnapshotFile } from "./types.ts";
 
 /** Промените на една продавница за еден ден, наспроти нејзината претходна снимка. */
@@ -128,10 +127,3 @@ export async function recordFetch(store: PriceStore, date: string, snapshot: Sna
   return record;
 }
 
-/** Најновата снимка и сите промени за секоја продавница од регистарот (за историјата). */
-export async function loadHistories(store: PriceStore, storeIds: Set<string>): Promise<StoreHistory[]> {
-  const latest = (await store.latestSnapshots()).filter((l) => storeIds.has(l.snapshot.storeId));
-  if (latest.length === 0) throw new Error("Нема преземени ценовници. Прво пушти: npm run fetch");
-  const changes = Map.groupBy(await store.changesBetween("0000-01-01", "9999-12-31"), (r) => r.storeId);
-  return latest.map(({ date, snapshot }) => ({ date, snapshot, changes: changes.get(snapshot.storeId) ?? [] }));
-}

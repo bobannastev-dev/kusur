@@ -43,6 +43,11 @@ async function pruneDated(dir: string, beforeDate: string, keep: (date: string, 
     if (date >= beforeDate) break;
     const dateDir = path.join(dir, date);
     for (const file of await readdir(dateDir)) {
+      // Остаток од прекинато запишување во стар ден: не е податок, само се чисти.
+      if (file.endsWith(".tmp")) {
+        await rm(path.join(dateDir, file));
+        continue;
+      }
       if (!file.endsWith(".json") || keep(date, file)) continue;
       await rm(path.join(dateDir, file));
       removed++;

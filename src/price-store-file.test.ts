@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtemp, readdir } from "node:fs/promises";
+import { mkdir, mkdtemp, readdir, writeFile } from "node:fs/promises";
 import { test } from "node:test";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -20,4 +20,14 @@ test("датотеки: презапишување преку привремен
   await store.saveSnapshot("2026-10-02", snap(2));
   assert.equal((await store.latestSnapshot("a"))?.snapshot.offers[0].price, 2);
   assert.deepEqual(await readdir(path.join(root, "snapshots", "2026-10-02")), ["a.json"]);
+});
+
+test("датотеки: бришењето ги чисти и остатоците од прекинато запишување во стари денови", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "poevtino-"));
+  const store = createFilePriceStore(root);
+  const oldDay = path.join(root, "changes", "2026-01-01");
+  await mkdir(oldDay, { recursive: true });
+  await writeFile(path.join(oldDay, "a.json.123.tmp"), "{");
+  assert.equal(await store.pruneChanges("2026-02-01"), 0);
+  assert.deepEqual(await readdir(path.join(root, "changes")), []);
 });

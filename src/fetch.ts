@@ -2,9 +2,9 @@
 // Употреба: npm run fetch            (сите продавници)
 //           npm run fetch -- zito    (само продавници чиј id почнува со „zito")
 
+import { addDays } from "./dates.ts";
 import { runByHost } from "./fetch-plan.ts";
 import { isStale } from "./freshness.ts";
-import { addDays } from "./history.ts";
 import { REQUEST_DELAY_MS } from "./net.ts";
 import { recordFetch } from "./price-store.ts";
 import { createFilePriceStore } from "./price-store-file.ts";
@@ -65,8 +65,9 @@ console.log(`\n${results.length - failed}/${results.length} продавници
 // По успешно преземање: старото надвор од рокот. Најновата снимка на секоја продавница
 // (и на онаа што денес паднала) останува секогаш.
 if (failed < results.length) {
-  const changes = await priceStore.pruneChanges(addDays(date, -KEEP_CHANGES_DAYS));
-  const snapshots = await priceStore.pruneSnapshots(addDays(date, -KEEP_SNAPSHOTS_DAYS));
+  // „Последните 7 дена" = денес и 6 дена пред тоа.
+  const changes = await priceStore.pruneChanges(addDays(date, 1 - KEEP_CHANGES_DAYS));
+  const snapshots = await priceStore.pruneSnapshots(addDays(date, 1 - KEEP_SNAPSHOTS_DAYS));
   if (changes || snapshots) console.log(`Избришано надвор од рокот: ${snapshots} снимки, ${changes} записи со промени`);
 }
 if (failed > 0) process.exit(1);
