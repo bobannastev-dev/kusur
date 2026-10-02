@@ -65,10 +65,10 @@ test("брендови: кандидатите и пакетот го носат
   const maps: TypeMaps = { categories: { А: { "КАФЕ": ["instant-kafe"] } }, products: {}, brands: BRANDS };
   const snapshot: SnapshotFile = {
     storeId: "a", chain: "А", label: "а", city: "Велес", fetchedAt: "2026-01-10T08:00:00.000Z", updatedAt: null,
-    offers: [offer("НЕСКАФЕ КЛАСИК 200ГР", 435, "КАФЕ"), offer("ИНСТАНТ КАФЕ ОДОР 200ГР", 300, "КАФЕ")],
+    offers: [offer("НЕСКАФЕ КЛАСИК 200ГР", 435, "КАФЕ"), offer("ИНСТАНТ КАФЕ 200ГР", 300, "КАФЕ")],
   };
   const brandsOf = (list: { offer: Offer; brand?: string }[]) => list.map((c) => [c.offer.name, c.brand]);
-  const expected = [["НЕСКАФЕ КЛАСИК 200ГР", "nescafe"], ["ИНСТАНТ КАФЕ ОДОР 200ГР", undefined]];
+  const expected = [["НЕСКАФЕ КЛАСИК 200ГР", "nescafe"], ["ИНСТАНТ КАФЕ 200ГР", undefined]];
   assert.deepEqual(brandsOf(findCandidates(snapshot, instant, maps)), expected);
 
   const bundle = buildBundle([{ date: "2026-01-10", snapshot, changes: [] }], [instant], maps, "2026-01-10");

@@ -66,7 +66,8 @@ export function brandErrors(brands: Brands, typeIds: Set<string>): string[] {
     if (!brand.types?.length) errors.push(`${id}: нема типови`);
     for (const t of brand.types ?? []) if (!typeIds.has(t)) errors.push(`${id}: непознат тип ${t}`);
     for (const p of brand.patterns ?? []) {
-      if (p !== p.toUpperCase()) errors.push(`${id}: шаблонот „${p}" не е со големи букви`);
+      const letters = p.replace(/\\[pP]\{[^}]*\}/g, "");
+      if (letters !== letters.toUpperCase()) errors.push(`${id}: шаблонот „${p}" не е со големи букви`);
       try {
         new RegExp(p, "u");
       } catch {

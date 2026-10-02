@@ -2,6 +2,7 @@
 // Употреба: npm run brands               — покриеност по тип (типовите од data/brands.json)
 //           npm run brands -- prashok    — брендовите на типот и најчестите зборови
 //                                          кај производите без бренд (за дополнување)
+//           npm run brands -- prashok --all — и сите производи без бренд
 //
 // Предлозите не одат во data/brands.json сами — одлучува човек.
 
@@ -55,9 +56,18 @@ for (const [id, items] of Map.groupBy(branded, (c) => c.brand!)) {
   console.log(`  ${brands[id].label} — ${items.length} (${chains})`);
 }
 
+const unbranded = list.filter((c) => !c.brand);
+if (process.argv.includes("--all")) {
+  console.log(`\nБез бренд (${unbranded.length}):`);
+  for (const c of unbranded.sort((a, b) => a.offer.name.localeCompare(b.offer.name, "mk"))) {
+    console.log(`  ${c.chain}: ${c.offer.name}${c.offer.description ? ` — ${c.offer.description}` : ""}`);
+  }
+  process.exit(0);
+}
+
 // Зборовите на производите без бренд: најчестите се веројатно брендови (или видот на производот).
 const words = new Map<string, Set<string>>();
-for (const c of list.filter((c) => !c.brand)) {
+for (const c of unbranded) {
   const text = `${c.offer.name} ${c.offer.description}`.toUpperCase();
   for (const w of new Set(text.split(/[^\p{L}]+/u).filter((w) => w.length >= 3))) {
     const names = words.get(w) ?? new Set<string>();

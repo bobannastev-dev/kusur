@@ -189,7 +189,7 @@ export const CATALOG: ProductType[] = [
   { id: "gaziran-sok", label: "Газиран сок", aliases: ["газиран сок", "кола", "кока кола", "пепси", "фанта", "спрајт"], unit: "l", defaultAmount: 1.5 },
   { id: "leden-chaj", label: "Леден чај", aliases: ["леден чај", "ладен чај"], unit: "l", defaultAmount: 1.5 },
   { id: "energetski", label: "Енергетски пијалок", aliases: ["енергетски пијалок", "ред бул"], unit: "l", defaultAmount: 0.25 },
-  { id: "pivo", label: "Пиво", aliases: ["пиво", "пива"], unit: "l", defaultAmount: 0.5, exclude: /БЕЗАЛКОХОЛ|0\.0|ПОВРАТНА АМБ/ },
+  { id: "pivo", label: "Пиво", aliases: ["пиво", "пива"], unit: "l", defaultAmount: 0.5, exclude: /БЕЗАЛКОХОЛ|0\.0|(?<![\d.,])0 ?%|ПОВРАТНА АМБ|САЈДЕР/ },
   { id: "vino", label: "Вино", aliases: ["вино"], unit: "l", defaultAmount: 0.75, exclude: /ПУНЧ|КОКТЕЛ|ОВОШН|ВАРЕНО/ },
   { id: "rakija", label: "Ракија", aliases: ["ракија"], unit: "l", defaultAmount: 0.7 },
   {
@@ -201,7 +201,7 @@ export const CATALOG: ProductType[] = [
   { id: "chaj", label: "Чај", aliases: ["чај", "чаеви"], unit: "kg", defaultAmount: 0.03, exclude: /ЛЕДЕН|ЛАДЕН|МАЧА/ },
 
   // ── Слатки и грицки ──
-  { id: "cokolado", label: "Чоколадо", aliases: ["чоколадо", "чоколада"], unit: "kg", defaultAmount: 0.1, exclude: /ГОТВЕЊЕ|ПРЕЛИВ|БОНБОЊ|БОНБОН|ТОПЛО|ДЕСЕРТ|ОРИЗ|РАЈС/ },
+  { id: "cokolado", label: "Чоколадо", aliases: ["чоколадо", "чоколада"], unit: "kg", defaultAmount: 0.1, exclude: /ВО ПРАВ|ГОТВЕЊЕ|ПРЕЛИВ|БОНБОЊ|БОНБОН|ТОПЛО|ДЕСЕРТ|ОРИЗ|РАЈС/ },
   { id: "biskviti", label: "Бисквити / кекс", aliases: ["бисквити", "кекс"], unit: "kg", defaultAmount: 0.3 },
   { id: "napolitanki", label: "Наполитанки / вафли", aliases: ["наполитанки", "вафли"], unit: "kg", defaultAmount: 0.2, exclude: /ШТРУДЛ/ },
   { id: "chips", label: "Чипс", aliases: ["чипс"], unit: "kg", defaultAmount: 0.15, require: /ЧИПС|ПРИНГЛС/, exclude: /ТОРТИЉ|ОРИЗ|КИКИРИТК|МАКАРОНИ|СТАПЧЕ|ФАНКИ/ },
@@ -215,9 +215,9 @@ export const CATALOG: ProductType[] = [
 
   // ── Домаќинство ──
   { id: "prashok", label: "Прашок за перење", aliases: ["прашок", "прашок за перење", "детергент за алишта", "детергент за перење"], unit: "kg", defaultAmount: 3, require: /ДЕТЕР|ПРАШОК|ПЕРСИЛ|АРИЕЛ|ФАКС|САВЕКС/, exclude: /ВАНИШ|ВЕНИШ|САПУН|ТЕЧЕН|ГЕЛ|КАПСУЛ|ДИСК|ОМЕК/ },
-  { id: "techen-detergent", label: "Течен детергент за алишта", aliases: ["течен детергент", "гел за перење"], unit: "l", defaultAmount: 2, exclude: /САДОВИ/ },
+  { id: "techen-detergent", label: "Течен детергент за алишта", aliases: ["течен детергент", "гел за перење"], unit: "l", defaultAmount: 2, exclude: /САДОВИ|ОМЕКНУВАЧ/ },
   { id: "kapsuli-perenje", label: "Капсули за перење", aliases: ["капсули за перење", "капсули за алишта"], unit: "pc", defaultAmount: 20 },
-  { id: "omeknuvac", label: "Омекнувач", aliases: ["омекнувач"], unit: "l", defaultAmount: 2, exclude: /СЕТ|\+/ },
+  { id: "omeknuvac", label: "Омекнувач", aliases: ["омекнувач"], unit: "l", defaultAmount: 2, exclude: /СЕТ|\+|ПЕГЛАЊ/ },
   { id: "detergent-sadovi", label: "Детергент за садови (рачно)", aliases: ["детергент за садови", "средство за садови", "фери"], unit: "l", defaultAmount: 0.5, exclude: /АБРАЗИВ|КРЕМ|МАШИН|СЕТ|БЕБ/ },
   { id: "tableti-masina", label: "Таблети за машина за садови", aliases: ["таблети за машина", "таблети за садови"], unit: "pc", defaultAmount: 50, require: /ТАБЛЕТ|КАПСУЛ/, exclude: /НЕГА|ЧИСТЕЊЕ/ },
   { id: "toaletna-hartija", label: "Тоалетна хартија", aliases: ["тоалетна хартија", "тоалет хартија"], unit: "pc", defaultAmount: 10, require: /ТОАЛЕТ/ },
@@ -230,12 +230,12 @@ export const CATALOG: ProductType[] = [
   { id: "varakina", label: "Варакина", aliases: ["варакина", "белило"], unit: "l", defaultAmount: 1, require: /ВАР[АИ]КИН/ },
 
   // ── Хигиена ──
-  { id: "sampon", label: "Шампон", aliases: ["шампон"], unit: "l", defaultAmount: 0.4, exclude: /РЕГ\.|ДЕЦА|БЕБЕ|ДЕТСКИ|КУПКА|РЕГЕНЕРАТОР|СЕТ|БАЛЗАМ|МАСКА/ },
+  { id: "sampon", label: "Шампон", aliases: ["шампон"], unit: "l", defaultAmount: 0.4, exclude: /РЕГ\.|ДЕЦА|БЕБЕ|ДЕТСКИ|КУПКА|РЕГЕНЕРАТОР|СЕТ|БАЛЗАМ|БАЛСАМ|СПРЕЈ|МАСКА/ },
   { id: "regenerator", label: "Регенератор за коса", aliases: ["регенератор", "балсам за коса"], unit: "l", defaultAmount: 0.2 },
   { id: "gel-tus", label: "Гел за туширање", aliases: ["гел за туширање", "туш гел", "купка"], unit: "l", defaultAmount: 0.4, exclude: /ДЕТ|ДЕЦА|СЕТ/ },
   { id: "sapun", label: "Сапун", aliases: ["сапун"], unit: "kg", defaultAmount: 0.09, exclude: /ТЕЧЕН|ПЕРЕЊЕ|ДЕТСК|БЕБ/ },
   { id: "techen-sapun", label: "Течен сапун", aliases: ["течен сапун"], unit: "l", defaultAmount: 0.5 },
-  { id: "pasta-zabi", label: "Паста за заби", aliases: ["паста за заби"], unit: "l", defaultAmount: 0.075, exclude: /ДЕЦА|ДЕТСК|ЈУНИОР|ЧЕТК|СЕТ/ },
+  { id: "pasta-zabi", label: "Паста за заби", aliases: ["паста за заби"], unit: "l", defaultAmount: 0.075, exclude: /ДЕЦА|ДЕТСК|ЈУНИОР|ЧЕТК|СЕТ|ИСПЛАКН|ЛИСТЕРИН/ },
   { id: "cetka-zabi", label: "Четка за заби", aliases: ["четка за заби", "четкичка"], unit: "pc", defaultAmount: 1, require: /ЧЕТК/, exclude: /ЕЛ\.|ЕЛЕКТР|ПАСТА|ДЕЦА|ДЕТСК|6\+|ЧЕПКАЛ|КОНЕЦ/ },
   { id: "dezodorans", label: "Дезодоранс", aliases: ["дезодоранс", "део"], unit: "l", defaultAmount: 0.15, exclude: /СЕТ|СТАПАЛА/ },
   { id: "vloski", label: "Хигиенски влошки", aliases: ["влошки", "хигиенски влошки"], unit: "pc", defaultAmount: 10, require: /ВЛОШК|ОЛВЕЈС|ОНА/, exclude: /ПАЗУВ|СЕКОЈДНЕВ|ДНЕВНИ|ЛАЈНЕР/ },
