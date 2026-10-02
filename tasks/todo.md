@@ -93,13 +93,14 @@
 
 ## Фаза 3: Секојдневно објавување
 
-- [ ] **Задача 8: GitHub Actions + Vercel**
+- [x] **Задача 8: GitHub Actions + Vercel**
   - Опис: `scripts/data-pack` (архива `data.tar.zst` ↔ `data/`), `.github/workflows/daily.yml` (закажано 08:30 UTC + рачно): враќање од Release `data-latest` (неуспех → стоп, без објава), `npm run fetch` (паднат маркет не го прекинува), зачувување (+ 7 дневни копии), `npm run build`, deploy на Vercel со токен од Secrets.
   - Прифаќање: рачно пуштање објавува нови цени; второ пуштање ја гледа историјата од првото.
   - Проверка: рачно пуштање во GitHub; апликацијата на `*.vercel.app`
   - Зависи од: 3–7; GitHub repo и Vercel сметка (од тебе)
   - Фајлови: `.github/workflows/daily.yml`, `scripts/`, `package.json`
   - Обем: M
+  - Направено (2026-10-02): апликацијата се вика **Кусур**, **https://kusur.online** (Vercel „Bobi's projects", проект `kusur`); јавно repo **bobannastev-dev/kusur** (историјата исчистена од е-поштата пред праќање, noreply адреса; резервна локална гранка `backup/pre-public`). `scripts/data-archive.sh` (Release `data-latest` + `data-daily` 7 дена), `.github/workflows/daily.yml` (08:30 UTC). Тајни во GitHub Secrets: `VERCEL_TOKEN` (го внесе корисникот), `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`. Прво пуштање: 9/9 продавници и од GitHub (САД), 3.105 сек, објавено на kusur.online. Дополнително по барање: горна лента со Поставки (тема По телефонот / Светла / Темна).
 
 ### Checkpoint C (модулот готов)
 - [ ] Сите 7 критериуми од `SPEC-web-app.md`
