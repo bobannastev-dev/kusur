@@ -13,8 +13,24 @@ const text = Onest({ subsets: ["cyrillic", "latin"], variable: "--font-text", di
 const display = Unbounded({ subsets: ["cyrillic", "latin"], weight: ["500", "600", "700"], variable: "--font-display", display: "swap" });
 
 export const metadata: Metadata = {
-  title: "Кусур — каде е поевтино",
-  description: "Каде е најевтина целата кошничка во Велес — цени од маркетите секој ден.",
+  metadataBase: new URL("https://kusur.online"),
+  title: "Кусур — каде е најевтина твојата кошничка?",
+  description: "Спореди ги цените во маркетите во Велес. Кусур ти покажува каде целата кошничка е најевтина и дали вреди да посетиш уште една продавница.",
+  openGraph: {
+    type: "website",
+    url: "https://kusur.online",
+    siteName: "Кусур",
+    locale: "mk_MK",
+    title: "Кусур — каде е најевтина твојата кошничка?",
+    description: "Спореди ги цените во маркетите во Велес. Најди ја најевтината кошничка со Кусур.",
+    images: [{ url: "/og-image.png", width: 1734, height: 907, type: "image/png", alt: "Кусур — спореди ја целата кошничка во маркетите во Велес" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Кусур — каде е најевтина твојата кошничка?",
+    description: "Спореди ги цените во маркетите во Велес. Најди ја најевтината кошничка со Кусур.",
+    images: [{ url: "/og-image.png", alt: "Кусур — спореди ја целата кошничка во маркетите во Велес" }],
+  },
   icons: { icon: "/icon-192.png", apple: "/apple-icon.png" },
   appleWebApp: { capable: true, title: "Кусур", statusBarStyle: "default" },
 };
