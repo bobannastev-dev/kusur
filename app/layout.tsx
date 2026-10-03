@@ -23,13 +23,14 @@ export const metadata: Metadata = {
     locale: "mk_MK",
     title: "Кусур — каде е најевтина твојата кошничка?",
     description: "Спореди ги цените во маркетите во Велес. Најди ја најевтината кошничка со Кусур.",
-    images: [{ url: "/og-image.png", width: 1734, height: 907, type: "image/png", alt: "Кусур — спореди ја целата кошничка во маркетите во Велес" }],
+    // JPG под 300 KB: WhatsApp и Viber не прикажуваат поголеми слики.
+    images: [{ url: "/og-image.jpg", width: 1200, height: 628, type: "image/jpeg", alt: "Кусур — спореди ја целата кошничка во маркетите во Велес" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Кусур — каде е најевтина твојата кошничка?",
     description: "Спореди ги цените во маркетите во Велес. Најди ја најевтината кошничка со Кусур.",
-    images: [{ url: "/og-image.png", alt: "Кусур — спореди ја целата кошничка во маркетите во Велес" }],
+    images: [{ url: "/og-image.jpg", alt: "Кусур — спореди ја целата кошничка во маркетите во Велес" }],
   },
   icons: { icon: "/icon-192.png", apple: "/apple-icon.png" },
   appleWebApp: { capable: true, title: "Кусур", statusBarStyle: "default" },
