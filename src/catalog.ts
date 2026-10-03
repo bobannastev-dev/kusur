@@ -230,7 +230,7 @@ export const CATALOG: ProductType[] = [
   { id: "varakina", label: "Варакина", aliases: ["варакина", "белило"], unit: "l", defaultAmount: 1, require: /ВАР[АИ]КИН/ },
 
   // ── Хигиена ──
-  { id: "sampon", label: "Шампон", aliases: ["шампон"], unit: "l", defaultAmount: 0.4, exclude: /РЕГ\.|ДЕЦА|БЕБЕ|ДЕТСКИ|КУПКА|РЕГЕНЕРАТОР|СЕТ|БАЛЗАМ|БАЛСАМ|СПРЕЈ|МАСКА/ },
+  { id: "sampon", label: "Шампон", aliases: ["шампон"], unit: "l", defaultAmount: 0.4, exclude: /РЕГ\.|ДЕЦА|БЕБЕ|ДЕТСКИ|КУПКА|РЕГЕНЕРАТОР|СЕТ|(?<!ШАМПОН И )БАЛ[ЗС]АМ|СПРЕЈ|МАСКА/ },
   { id: "regenerator", label: "Регенератор за коса", aliases: ["регенератор", "балсам за коса"], unit: "l", defaultAmount: 0.2 },
   { id: "gel-tus", label: "Гел за туширање", aliases: ["гел за туширање", "туш гел", "купка"], unit: "l", defaultAmount: 0.4, exclude: /ДЕТ|ДЕЦА|СЕТ/ },
   { id: "sapun", label: "Сапун", aliases: ["сапун"], unit: "kg", defaultAmount: 0.09, exclude: /ТЕЧЕН|ПЕРЕЊЕ|ДЕТСК|БЕБ/ },
